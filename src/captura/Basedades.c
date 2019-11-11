@@ -34,7 +34,7 @@
 #include <linux/spi/spidev.h>
 #include <string.h>
 #include <time.h>
-
+#include <wiringPi.h>
 
 int verbose = 0;
 
@@ -191,6 +191,7 @@ static int spiadc_config_transfer( int conf, int *value )
 	return ret;
 }
 
+/////////////////////////////////////////////////////////////Comunicacion SPI////////////////////////////////////////////////////////////////////////
 
 static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
    int i;
@@ -200,8 +201,8 @@ static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
    printf("\n");
    return 0;
 }
-
-int openDB(char * name, sqlite3** db){ //Crear o obrir la base de dades.
+//Crear o abrir la base de datos.
+int openDB(char * name, sqlite3** db){ 
 	int rc;
 	
 	/* Open database */
@@ -210,12 +211,14 @@ int openDB(char * name, sqlite3** db){ //Crear o obrir la base de dades.
 		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(*db));
 		return 1;
 		
-	} else {
-		fprintf(stdout, "Opened database successfully\n");
-	}
+	} 	
+		/*else {
+			fprintf(stdout, "Opened database successfully\n");		//Comentari tot ok.
+		}
+		*/
 	return 0;
 }
-
+//Creacion de la tabla: Lectures_table
 int CreateTable(sqlite3* db){ 
 	int rc;
 	char sql[500];
@@ -244,16 +247,16 @@ int CreateTable(sqlite3* db){
 				  sqlite3_free(zErrMsg);
 				  return 1;
 				}  
-			   
+			   /*
 					else {
 					fprintf(stdout, "Table created successfully\n");
 					}
-		   
+		   */
 		}
 	return 0;
 }
-
-int CreateTable1(sqlite3* db){ 
+//Creacion de la tabla: Sensors_table
+int CreateTable1(sqlite3* db){
 	int rc;
 	char sql[500];
 	char sql1[500];
@@ -280,13 +283,14 @@ int CreateTable1(sqlite3* db){
 			  sqlite3_free(zErrMsg);
 			  return 1;
 			}
-					else {
+					/*else {
 					fprintf(stdout, "Table created successfully\n");
 					}
+					*/
 		}
 	return 0;
 }
-
+//Creacion de la tabla: Alarms_table
 int CreateTable2(sqlite3* db){ 
 	int rc;
 	char sql[500];
@@ -312,15 +316,16 @@ int CreateTable2(sqlite3* db){
 			  sqlite3_free(zErrMsg);
 			   return 1; 
 		   } 
-		   
+		   /*
 				else {
 				fprintf(stdout, "Table created successfully\n");
 				}
+				*/
 		}   
 	return 0;
 }
-
-int insertTable(sqlite3* db, char* date, float value){ //Insertar en la tabla lecture
+//Insertar los datos en tabla Lectures_table
+int insertTable(sqlite3* db, char* date, float value){ 
 	int rc;
 	char sql[500];
 	char *zErrMsg = 0;
@@ -336,15 +341,11 @@ int insertTable(sqlite3* db, char* date, float value){ //Insertar en la tabla le
 		sqlite3_free(zErrMsg);
 
 		return 1;
-		}
-			else{
-				fprintf(stdout, "Insercio correcta");
-			}
-			
+		}	
 	return 0;
 }
-
-int insertTable1(sqlite3* db, char* date, float value){ //Insertar en tabla sensor
+//Insertar los datos en tabla Sensors_table
+int insertTable1(sqlite3* db, char* date, float value){ 
 	int rc;
 	char sql[500];
 	char *zErrMsg = 0;
@@ -363,20 +364,18 @@ int insertTable1(sqlite3* db, char* date, float value){ //Insertar en tabla sens
 			sqlite3_free(zErrMsg);
 
 			return 1;
-			
 		}
 
 	return 0;
 	   
 }
-
-int insertTable2(sqlite3* db, char* date_alarm, char* Alarm_description){ //Insertar los valores en Alarms_table
+//Insertar los datos en tabla Alarms_table
+int insertTable2(sqlite3* db, char* date_alarm, char* Alarm_description){ 
 	int rc;
 	char sql[500];
 	char *zErrMsg = 0;
 	
 	 /* Insercion de valores Tabla Alarms_table*/
-	
 	sprintf(sql,"INSERT INTO Alarms_table (Date_time_alarm,Alarm_description) VALUES ('%s','%s');",date_alarm, Alarm_description);
 	
 	rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
@@ -387,24 +386,18 @@ int insertTable2(sqlite3* db, char* date_alarm, char* Alarm_description){ //Inse
 
 		return 1;
 		}
-			else{
-				fprintf(stdout, "Insercio correcta");
-			}
-	
 	return 0;
 	   
 }
-
-int showTable(sqlite3* db){ //Mostrat por pantalla el contenido de la base de datos.
+//Mostrat por pantalla el contenido de la base de datos.
+int showTable(sqlite3* db){ 
 	
 	int rc;
 	char sql[500];
 	char *zErrMsg = 0;
 	
-	/* Visulizacion valores Tabla 1 */
-	
+	/* Visulizacion valores Tabla Lectures_table */
 	sprintf(sql, "SELECT * FROM Lectures_table");
-	//sprintf(sql, "SELECT * FROM Lectures_table,Sensors_table,Alarms_table");
 
 	rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
 	
@@ -417,7 +410,21 @@ int showTable(sqlite3* db){ //Mostrat por pantalla el contenido de la base de da
 
    return 0;
 }
-
+//Funcion encender LED
+int parpadeo(void){
+	wiringPiSetup();
+	pinMode(0, OUTPUT);
+	int i=0;
+	for (i=0; i<1; i++){
+		digitalWrite(0,HIGH);
+		delay(100);
+		digitalWrite(0,LOW);
+		delay(100);
+	}
+	
+	return 0;
+	
+	}
 
 int main(int argc, char* argv[]) {
 	
@@ -425,37 +432,35 @@ int main(int argc, char* argv[]) {
 	char date_alarm[100];
 	char Alarm_description[100];
 	int ret=0;
-	int value_int;
-	float value_volts;
+	int value_int;//la variable que se lee por spi
+	float value_volts;//Valor escalat a 3.3V
 	
 	sqlite3 *db;
 	
-	openDB("captura.db", &db);
+	openDB("captura.db", &db);//abrir base de datos
 	
-	CreateTable(db);
+	CreateTable(db);//Creacion tabla Lectures_table
 	
-	CreateTable1(db);
+	CreateTable1(db);//Creacion tabla Sensors_table
 	
-	CreateTable2(db);
+	CreateTable2(db);//Creacion tabla Alarms_table
 
 	while(1){
 		ret = spiadc_config_transfer( SINGLE_ENDED_CH2, &value_int );
-
-		//printf("voltatge %.3f V\n", value_volts);
-		//printf("valor llegit (0-1023) %d\n", value_int);
-		//fprintf(stdout, "%lu\n", (unsigned long)t);
 		
 		value_volts=3.3*value_int/1023;
+		
+		/* Funcion de la fecha del sistema */
 		time_t t = time(NULL);
-		struct tm tm = *localtime(&t);
-		//printf("Temps actual: %d-%d-%d %d:%d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1,tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);	
+		struct tm tm = *localtime(&t);	
 		sprintf(date,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);	
 
-		insertTable(db,date,value_volts);
+		insertTable(db,date,value_volts);//Insercion datos tabla Lectures_table
 		
-		insertTable1(db,date,value_volts);
+		parpadeo();//Encender y apagar led
 		
-			
+		insertTable1(db,date,value_volts);//Insercion datos tabla Sensors_table
+		
 		/*Alarms*/
 		
 			if(value_volts > 2.7){
@@ -468,11 +473,11 @@ int main(int argc, char* argv[]) {
 			sprintf(date_alarm,NULL);
 			}
 		
-		insertTable2(db,date_alarm,Alarm_description);
+		insertTable2(db,date_alarm,Alarm_description);//Insercion datos tabla Alarms_table
 	
-		showTable(db);
+		//showTable(db); //Funcion que permite imprimir tablas por pantalla.
 		
-		sleep(5);
+		sleep(5);//Retardo de 5s entre capturas
 	}
 	
 	sqlite3_close(db);
