@@ -22,7 +22,7 @@
   * along with this program. If not, see http://www.gnu.org/licenses/.
 */
 
-//Libreria con las demás librerias, declaraciones de variables y funciones
+//Libreria con las demás librerias, declaraciones de variables globales y funciones
 #include "funcADSTR.h"
 
 int main(int argc, char* argv[]) {

@@ -25,7 +25,7 @@
 //~ #define SINGLE_ENDED_CH5 13
 //~ #define SINGLE_ENDED_CH6 14
 //~ #define SINGLE_ENDED_CH7 15
-//~ #define DIFERENTIAL_CH0_CH1 0 //Chanel CH0 = IN+ CH1 = IN-
+#define DIFERENTIAL_CH0_CH1 0 //Chanel CH0 = IN+ CH1 = IN-
 //~ #define DIFERENTIAL_CH1_CH0 1 //Chanel CH0 = IN- CH1 = IN+
 //~ #define DIFERENTIAL_CH2_CH3 2 //Chanel CH2 = IN+ CH3 = IN-
 //~ #define DIFERENTIAL_CH3_CH2 3 //Chanel CH2 = IN- CH3 = IN+

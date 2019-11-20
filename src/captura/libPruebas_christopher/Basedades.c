@@ -54,7 +54,8 @@ int main(int argc, char* argv[]) {
 	char Alarm_description[100];
 	int ret = 0;
 	int value_int;
-	float value_volts;
+	float value_volts,value_amps;
+	int seg_lectura,min_alarma;
 	
 	sqlite3 *db;
 	
@@ -67,17 +68,19 @@ int main(int argc, char* argv[]) {
 	CreateTable2(db);
 
 	while(1){
+		
+		//----Lectura de sensor tensión en bornes de la batería---------
 		ret = spiadc_config_transfer(SINGLE_ENDED_CH2, &value_int);
 
 		//printf("voltatge %.3f V\n", value_volts);
 		//printf("valor llegit (0-1023) %d\n", value_int);
 		//fprintf(stdout, "%lu\n", (unsigned long)t);
 		
-		value_volts=3.3*value_int/1023;
+		value_volts=3.3*value_int/1023; //Conversión a voltaje real
 		time_t t = time(NULL);
 		struct tm tm = *localtime(&t);
-		//printf("Temps actual: %d-%d-%d %d:%d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1,tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);	
-		sprintf(date,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);	
+		sprintf(date,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,
+		tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);	
 
 		insertTable(db,date,value_volts);
 		
@@ -86,17 +89,42 @@ int main(int argc, char* argv[]) {
 			
 		/*Alarms*/
 		
-			if(value_volts > 2.7){
+		if(value_volts > 2.7){
 			sprintf(Alarm_description,"Exceso de tension");
-			sprintf(date_alarm,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);
-			}
+			sprintf(date_alarm,"%d-%d-%d %d:%d:%d", tm.tm_mday,
+			tm.tm_mon + 1,tm.tm_year + 1900, tm.tm_hour, tm.tm_min,
+			tm.tm_sec);
+		}
 
 		
 		insertTable2(db, date_alarm, Alarm_description);
-	
-		showTable(db);
+
+		//----Lectura de sensor intensidad de carga a la batería--------
+		ret = spiadc_config_transfer(DIFERENTIAL_CH0_CH1, &value_int);
 		
-		sleep(5);
+		value_amps=value_int/(0.5*1023); //Conversión a voltaje real
+		sprintf(date,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,
+		tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);	
+
+		insertTable(db,date,value_amps);
+		
+		insertTable1(db,date,value_amps);
+		
+			
+		/*Alarms*/
+		
+		if(value_amps > 1){
+			sprintf(Alarm_description,"Peligro, hay una fuga de corriente");
+			sprintf(date_alarm,"%d-%d-%d %d:%d:%d", tm.tm_mday,
+			tm.tm_mon + 1,tm.tm_year + 1900, tm.tm_hour, tm.tm_min,
+			tm.tm_sec);
+		}
+
+		
+		insertTable2(db, date_alarm, Alarm_description);
+		//showTable(db);
+		
+		sleep(seg_lectura);
 	}
 	
 	sqlite3_close(db);
