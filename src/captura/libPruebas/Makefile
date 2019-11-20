@@ -6,7 +6,7 @@ Appcaptura:
 
 libreria: FuncADSTR.o libFuncADSTR.so
 	gcc -c -o Basedades.o Basedades.c -I.
-	gcc -o Basedades Basedades.o -L. -l.
+	gcc -o Basedades Basedades.o -L. -llibFuncADSTR.so
 
 FuncADSTR.o: FuncADSTR.c
 	gcc -fPIC -c -o FuncADSTR.o  FuncADSTR.c
