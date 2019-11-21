@@ -28,6 +28,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include "http.h"
 
 
 
@@ -45,8 +46,9 @@
 *
 */
 int http(char serverName[20], char* nombre_archivo, int *minuts, int *segons){
-	if (serverName ==""){
-		strcpy(serverName,"172.28.18.16");
+	printf("Pene");
+	if (serverName == ""){
+		strcpy(serverName, "172.28.18.16");
 
 	}
 	if (nombre_archivo == ""){
@@ -62,8 +64,8 @@ int http(char serverName[20], char* nombre_archivo, int *minuts, int *segons){
 	int			i=0,val=0;
 	char		parametre_web[5];
 	char		missatge[200];
-	char		*min[2];
-	char		*seg[2];
+	char		min[2];
+	char		seg[2];
 	
 	sprintf(missatge,	"GET /%s HTTP/1.1\r\n"\
 						"Host: captura\r\n\r\n", nombre_archivo);
@@ -108,12 +110,13 @@ int http(char serverName[20], char* nombre_archivo, int *minuts, int *segons){
 		parametre_web[c]=buffer[val];
 	}
 	printf("val = %s \n", parametre_web);
-	
-	min = strtok(parametre_web, ",");
-	seg = strtok(parametre_web, " ");
 
-	*minuts = min;
-	*segons = seg;
+	printf("%s", strtok(parametre_web, ","));
+	//~ min = strtok(parametre_web, ",");
+	//~ seg = strtok(parametre_web, " ");
+
+	*minuts = atoi(min);
+	*segons = atoi(seg);
 		
 	printf("min = %i \n", *minuts);
 	printf("seg = %i \n", *segons);
