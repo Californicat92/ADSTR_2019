@@ -26,6 +26,7 @@
 #include "funcADSTR.h"
 
 int main(int argc, char* argv[]) {
+	
 	//Lectura por comandos de IP del servidor para consultas HTTP y ruta y nombre de la base de datos
 	int opt= 0;
 	char *ip_servidor=0,*ruta_bbdd=0;
@@ -50,7 +51,7 @@ int main(int argc, char* argv[]) {
     printf("La ruta de la base de datos es: %s\n",ruta_bbdd);
     //Variables consulta sql
 	char data[200];
-	char sql[120];
+	char sql[200];
 	int rc;
 	char *zErrMsg = 0;
 	
@@ -61,7 +62,7 @@ int main(int argc, char* argv[]) {
 	int ret = 0;
 	int value_int;
 	float value_volts,value_amps;
-	int seg_lectura,min_alarma;
+	int seg_lectura=10,min_alarma=5;
 	char types[50],sensor_description[100];
 	int n_max_sensores,id;
 	sqlite3 *db;
@@ -70,31 +71,49 @@ int main(int argc, char* argv[]) {
 	
 	// Comprovacion si hay tablas ya creadas en la base de datos
 	memset(data, '\0', sizeof(data));
-	sprintf(sql, "SELECT (ID) FROM Sensors_table");
+	sprintf(sql, "SELECT * FROM Sensors_table");
 
 	/* Execute SQL statement */
 	rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
 
+	// Si no hay tablas, se crean
 	if (rc != SQLITE_OK) {
-		printf("SQL error: %s\n", zErrMsg);
-		CreateTable(db);
-		CreateTable1(db);
-		CreateTable2(db);
+		
+		//Creamos Tabla de Lecturas
+		memset(sql, '\0', sizeof(sql));
+		sprintf(sql,	"CREATE TABLE Lectures_table(" \
+						"ID						INTEGER 	PRIMARY KEY	AUTOINCREMENT," \
+						"Date_time_lecture		DATE    	NOT NULL," \
+						"Value					INT   		NOT NULL);");
+		rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
+		
+		//Creamos Tabla de Sensores
+		memset(sql, '\0', sizeof(sql));
+		sprintf(sql,	"CREATE TABLE Sensors_table("  \
+						"ID						INTEGER 	PRIMARY KEY	AUTOINCREMENT," \
+						"Types					CHAR  		NOT NULL," \
+						"Description			CHAR  		NOT NULL);");
+		rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
+		
+		//Creamos Tabla de Alarmas
+		memset(sql, '\0', sizeof(sql));
+		sprintf(sql,	"CREATE TABLE Alarms_table("  \
+						"Date_time_alarm		DATE    NOT NULL," \
+						"Alarm_description		CHAR    NOT NULL);");
+		rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
+
+		// Insertamos sensor de tensión
+		sprintf(types,"Sensor Tension");
+		sprintf(sensor_description,"Sensor que muestra la lectura de tension de la placa fotovoltaica");
+		insertTable1(db,date,types,sensor_description);	
+
+		// Insertamos sensor de tensión
+		sprintf(types,"Sensor corriente");
+		sprintf(sensor_description,"Sensor que muestra la lectura de corriente de la batería");
+		insertTable1(db,date,types,sensor_description);
 	}
 
-	
-	
-	// Crear condicion de si existe sensor ----------------------------------------------------------------------------
-	// Insertamos sensor de tensión
-	sprintf(types,"Sensor Tension");
-	sprintf(sensor_description,"Sensor que muestra la lectura de tension de la placa fotovoltaica");
-	insertTable1(db,date,types,sensor_description);	
-	
-	// Crear condicion de si existe sensor ----------------------------------------------------------------------------
-	// Insertamos sensor de tensión
-	sprintf(types,"Sensor Tension");
-	sprintf(sensor_description,"Sensor que muestra la lectura de tension de la placa fotovoltaica");
-	insertTable1(db,date,types,sensor_description);
+
 
 	/* Lectura nº de ID sensor maxima */
 	memset(data, '\0', sizeof(data));
@@ -108,7 +127,7 @@ int main(int argc, char* argv[]) {
 		sqlite3_free(zErrMsg);
 	}
 	n_max_sensores = atoi(data);
-			
+
 	while(1){
 		
 	for (id = 0; id <= n_max_sensores; id++)
@@ -163,10 +182,6 @@ int main(int argc, char* argv[]) {
 		insertTable2(db, date_alarm, Alarm_description);
 		//showTable(db);
 	}
-		
-		
-
-		
 		sleep(seg_lectura);
 	}
 	

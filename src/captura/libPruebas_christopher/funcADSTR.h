@@ -41,10 +41,7 @@ void spiadc_config_tx(int conf, uint8_t tx[3]);
 int spiadc_transfer(int fd, uint8_t bits, uint32_t speed, uint16_t delay, uint8_t tx[3], uint8_t *rx, int len);
 int spiadc_config_transfer( int conf, int *value);
 int callback(void *data, int argc, char **argv, char **azColName);
-int openDB(char * name, sqlite3** db); //Crear o obrir la base de dades.
-int CreateTable(sqlite3* db);
-int CreateTable1(sqlite3* db);
-int CreateTable2(sqlite3* db);
+int openDB(char * name, sqlite3** db); //Crear o obrir la base de dades
 int insertTable(sqlite3* db, char* date, float value, int id);
 int insertTable1(sqlite3* db, char* date, char* types, char* description);
 int insertTable2(sqlite3* db, char* date_alarm, char* Alarm_description);
