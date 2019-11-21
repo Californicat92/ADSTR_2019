@@ -1,24 +1,21 @@
-all: Appcaptura
+all: Captura
 
-Appcaptura:
-	gcc Basedades.c -o Basedades -lsqlite3
-	./Basedades
+Captura: http.o libHTTP.so Basedades.o Funciones.o 
+	gcc Basedades.o Funciones.o -o Captura -lsqlite3 -L. -lHTTP
+	LD_LIBRARY_PATH=. ./Captura -i 127.0.0.1 -n config.txt -r /home/cali/Desktop/ADSTR_2019/src/captura/captura.db
 
-libreria: mainXungo.o http.o libHTTP.so
-	gcc -o mainXungo mainXungo.o -L/home/pi/Desktop/ADSTR_2019/src/captura/ -lHTTP
+main.o: Basedades.c
+	gcc -c Basedades.c
 
-Basedades.o: mainXungo.c
-	gcc -c -o mainXungo.o mainXungo.c -I/home/pi/Desktop/ADSTR_2019/src/captura/
-
-http.o: http.c
-	gcc -fPIC -c -o http.o  http.c
+factorial.o: Funciones.c
+	gcc -c Funciones.c 
 
 libHTTP.so: http.o
 	gcc -shared -fPIC -o libHTTP.so http.o
 
-exec: libreria
-	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/pi/Desktop/ADSTR_2019/captura/ ./mainXungo
+http.o: http.c
+	gcc -fPIC -c -o http.o  http.c
 
 clean:
-	rm -rf *o *db Basedades -r doc
+	rm -rf *o *db *gch Captura
 

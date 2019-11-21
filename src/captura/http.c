@@ -46,7 +46,7 @@
 *
 */
 int http(char serverName[20], char* nombre_archivo, int *minuts, int *segons){
-	printf("Pene");
+	*minuts=0,*segons=0;
 	if (serverName == ""){
 		strcpy(serverName, "172.28.18.16");
 
@@ -64,8 +64,8 @@ int http(char serverName[20], char* nombre_archivo, int *minuts, int *segons){
 	int			i=0,val=0;
 	char		parametre_web[5];
 	char		missatge[200];
-	char		min[2];
-	char		seg[2];
+	const char 	s[2] = ",";
+	char 		*min,*seg;
 	
 	sprintf(missatge,	"GET /%s HTTP/1.1\r\n"\
 						"Host: captura\r\n\r\n", nombre_archivo);
@@ -93,13 +93,13 @@ int http(char serverName[20], char* nombre_archivo, int *minuts, int *segons){
 	/*Enviar*/
 	strcpy(buffer,missatge); //Copiar missatge a buffer
 	result = write(sFd, buffer, strlen(buffer));
-	printf("Missatge enviat a servidor(bytes %d): %s\n",	result, missatge);
+	//~ printf("Missatge enviat a servidor(bytes %d): %s\n",	result, missatge);
 
 	/*Rebre fins que no arribi el caràcter $*/
 	do{
 		result = read(sFd, buffer, 256);
 		buffer[result] = 0;
-		printf("Missatge rebut del servidor(bytes %d): %s\n",	result, buffer);
+		//~ printf("Missatge rebut del servidor(bytes %d): %s\n",	result, buffer);
 	}
 	while (buffer == NULL);
 	
@@ -109,17 +109,15 @@ int http(char serverName[20], char* nombre_archivo, int *minuts, int *segons){
 	for (c=0; val < i; val++, c++){
 		parametre_web[c]=buffer[val];
 	}
-	printf("val = %s \n", parametre_web);
+	//~ printf("val = %s \n", parametre_web);
 
-	printf("%s", strtok(parametre_web, ","));
-	//~ min = strtok(parametre_web, ",");
-	//~ seg = strtok(parametre_web, " ");
-
+	min = strtok(parametre_web, s);
+	seg = strtok(NULL, s);
 	*minuts = atoi(min);
 	*segons = atoi(seg);
 		
-	printf("min = %i \n", *minuts);
-	printf("seg = %i \n", *segons);
+	//~ printf("min = %i \n", *minuts);
+	//~ printf("seg = %i \n", *segons);
 	
 	/*Tancar el socket*/
 	close(sFd);
