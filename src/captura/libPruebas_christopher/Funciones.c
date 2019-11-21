@@ -31,7 +31,7 @@ static char *cntdevice = "/dev/spidev0.0";// definicio pin select (0.1)/CS1
 // -----------------------------GETOPT HELP-------------------------------------
 void print_usage() {
     printf(	"\n/---------------------HELP-------------------------------\n"\
-			"Uso:	Introducir -p seguido de la IP del servidor \n" \
+			"Uso:	Introducir -i seguido de la IP del servidor \n" \
 			"\tIntroducir -r seguido de la ruta y nombre.db de la base de "\
 			"datos\n"\
 			"/-----------------------------------------------------------\n\n");
@@ -158,14 +158,14 @@ int spiadc_config_transfer(int conf, int *value){
 	return ret;
 }
 // -----------------------------------------------------------------------------
-
-int callback(void *NotUsed, int argc, char **argv, char **azColName){
-   int i;
-   for(i = 0; i<argc; i++) {
-      printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+int callback(void *data, int argc, char **argv, char **azColName){
+	int i;
+	for(i = 0; i<argc; i++) {
+		sprintf(data, "%s", argv[i] ? argv[i] : "NULL");
+		//printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
    }
-   printf("\n");
-   return 0;
+	printf("\n");
+	return 0;
 }
 // -----------------------------------------------------------------------------
 
@@ -291,14 +291,14 @@ int CreateTable2(sqlite3* db){
 }
 // -----------------------------------------------------------------------------
 //Insertar en la tabla lecture
-int insertTable(sqlite3* db, char* date, float value){
+int insertTable(sqlite3* db, char* date, float value, int id){
 	int rc;
 	char sql[500];
 	char *zErrMsg = 0;
 	
 	 /* Insercion de valores Tabla Lectures_table */
 	
-	sprintf(sql,"INSERT INTO Lectures_table(Date_time_lecture,Value) VALUES ('%s',%f);", date, value);// Date_time y value denominacion en la tabla, denominacion de especificador de formato tipo string y float.
+	sprintf(sql,"INSERT INTO Lectures_table(ID,Date_time_lecture,Value) VALUES (%i,'%s',%f);", id, date, value);// Date_time y value denominacion en la tabla, denominacion de especificador de formato tipo string y float.
 	
 	rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
 
@@ -316,18 +316,14 @@ int insertTable(sqlite3* db, char* date, float value){
 }
 // -----------------------------------------------------------------------------
 //Insertar en tabla sensor
-int insertTable1(sqlite3* db, char* date, float value){
+int insertTable1(sqlite3* db, char* date, char* types, char* description){
 	int rc;
 	char sql[500];
 	char *zErrMsg = 0;
-	char Description[100];
-	char Types[100];
 	
-		sprintf(Types,"Sensor Tension");
-		sprintf(Description,"Sensor que muestra la lectura de tension de la placa fotovoltaica");
 
 			/* Insercion de valores Tabla Sensors_table*/
-	sprintf(sql,"INSERT INTO Sensors_table (Types,Description) VALUES ('%s','%s');",Types, Description);
+	sprintf(sql,"INSERT INTO Sensors_table (Types,Description) VALUES ('%s','%s');",types, description);
 	rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
 
 	if( rc != SQLITE_OK ){

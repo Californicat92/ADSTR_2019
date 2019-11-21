@@ -48,7 +48,13 @@ int main(int argc, char* argv[]) {
     }
     printf("La IP del servidor seleccionada es: %s\n",ip_servidor);
     printf("La ruta de la base de datos es: %s\n",ruta_bbdd);
-
+    //Variables consulta sql
+	char data[200];
+	char sql[120];
+	int rc;
+	char *zErrMsg = 0;
+	
+	
 	char date[100];
 	char date_alarm[100];
 	char Alarm_description[100];
@@ -56,19 +62,57 @@ int main(int argc, char* argv[]) {
 	int value_int;
 	float value_volts,value_amps;
 	int seg_lectura,min_alarma;
-	
+	char types[50],sensor_description[100];
+	int n_max_sensores,id;
 	sqlite3 *db;
 	
 	openDB("captura.db", &db);
 	
-	CreateTable(db);
-	
-	CreateTable1(db);
-	
-	CreateTable2(db);
+	// Comprovacion si hay tablas ya creadas en la base de datos
+	memset(data, '\0', sizeof(data));
+	sprintf(sql, "SELECT (ID) FROM Sensors_table");
 
+	/* Execute SQL statement */
+	rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
+
+	if (rc != SQLITE_OK) {
+		printf("SQL error: %s\n", zErrMsg);
+		CreateTable(db);
+		CreateTable1(db);
+		CreateTable2(db);
+	}
+
+	
+	
+	// Crear condicion de si existe sensor ----------------------------------------------------------------------------
+	// Insertamos sensor de tensión
+	sprintf(types,"Sensor Tension");
+	sprintf(sensor_description,"Sensor que muestra la lectura de tension de la placa fotovoltaica");
+	insertTable1(db,date,types,sensor_description);	
+	
+	// Crear condicion de si existe sensor ----------------------------------------------------------------------------
+	// Insertamos sensor de tensión
+	sprintf(types,"Sensor Tension");
+	sprintf(sensor_description,"Sensor que muestra la lectura de tension de la placa fotovoltaica");
+	insertTable1(db,date,types,sensor_description);
+
+	/* Lectura nº de ID sensor maxima */
+	memset(data, '\0', sizeof(data));
+	sprintf(sql, "SELECT MAX(ID) FROM Sensors_table");
+
+	/* Execute SQL statement */
+	rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
+
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		sqlite3_free(zErrMsg);
+	}
+	n_max_sensores = atoi(data);
+			
 	while(1){
 		
+	for (id = 0; id <= n_max_sensores; id++)
+	{
 		//----Lectura de sensor tensión en bornes de la batería---------
 		ret = spiadc_config_transfer(SINGLE_ENDED_CH2, &value_int);
 
@@ -82,10 +126,7 @@ int main(int argc, char* argv[]) {
 		sprintf(date,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,
 		tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);	
 
-		insertTable(db,date,value_volts);
-		
-		insertTable1(db,date,value_volts);
-		
+		insertTable(db,date,value_volts,id);
 			
 		/*Alarms*/
 		
@@ -105,10 +146,8 @@ int main(int argc, char* argv[]) {
 		value_amps=value_int/(0.5*1023); //Conversión a voltaje real
 		sprintf(date,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,
 		tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);	
-
-		insertTable(db,date,value_amps);
 		
-		insertTable1(db,date,value_amps);
+		insertTable(db,date,value_amps,id);
 		
 			
 		/*Alarms*/
@@ -123,6 +162,10 @@ int main(int argc, char* argv[]) {
 		
 		insertTable2(db, date_alarm, Alarm_description);
 		//showTable(db);
+	}
+		
+		
+
 		
 		sleep(seg_lectura);
 	}
