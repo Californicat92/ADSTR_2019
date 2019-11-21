@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
 	openDB("captura.db", &db);
 	
 	// Comprovacion si hay tablas ya creadas en la base de datos
-	memset(data, '\0', sizeof(data));
+	memset(sql, '\0', sizeof(sql));
 	sprintf(sql, "SELECT * FROM Sensors_table");
 
 	/* Execute SQL statement */
@@ -182,6 +182,7 @@ int main(int argc, char* argv[]) {
 		insertTable2(db, date_alarm, Alarm_description);
 		//showTable(db);
 	}
+		printf("!");
 		sleep(seg_lectura);
 	}
 	
