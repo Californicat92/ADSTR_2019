@@ -16,6 +16,7 @@
 #include <time.h>
 #include <getopt.h>
 #include "http.h"
+#include <wiringPi.h>
 
 //ADC configurations segons manual MCP3008
 //~ #define SINGLE_ENDED_CH0 8
@@ -35,6 +36,8 @@
 //~ #define DIFERENTIAL_CH6_CH7 6 //Chanel CH6 = IN+ CH7 = IN-
 //~ #define DIFERENTIAL_CH7_CH6 7 //Chanel CH6 = IN- CH7 = IN+
 
+#define	LED	0 // LED Pin - wiringPi pin 0 is BCM_GPIO 17.
+
 //Declaración de funciones
 void print_usage(); // Func. opciones ayuda GETOPT
 void pabort(const char *s);// Indicacion de un error
@@ -47,6 +50,7 @@ int insertTable(sqlite3* db, char* date, float value, int id);
 int insertTable1(sqlite3* db, char* date,int id, char* types, char* description);
 int insertTable2(sqlite3* db, char* date_alarm, char* Alarm_description);
 int showTable(sqlite3* db); //Mostrat por pantalla el contenido de la base de datos.
+int blink (void);
 // -----------------------------------------------------------------------------
 
 #endif

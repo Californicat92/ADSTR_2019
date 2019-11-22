@@ -208,7 +208,7 @@ int insertTable(sqlite3* db, char* date, float value, int id){
 		return 1;
 		}
 			else{
-				fprintf(stdout, "Insercio correcta");
+				fprintf(stdout, "Insercio de sensors a BBDD correcta ");
 			}
 			
 	return 0;
@@ -254,7 +254,7 @@ int insertTable2(sqlite3* db, char* date_alarm, char* Alarm_description){
 		return 1;
 	}
 	else{
-		fprintf(stdout, "Insercio correcta");
+		fprintf(stdout, "Insercio d'alarmes a BBDD correcta\n");
 	}
 	return 0; 
 }
@@ -285,4 +285,22 @@ int showTable(sqlite3* db){
 }
 // -----------------------------------------------------------------------------
 
+int blink (void)
+{
+  printf ("Raspberry Pi blink\n") ;
+
+  wiringPiSetup () ;
+  pinMode (LED, OUTPUT) ;
+
+    digitalWrite (LED, HIGH) ;	// On LED Pin - wiringPi pin 0 is BCM_GPIO 17.
+    delay (500) ;		// mS
+    digitalWrite (LED, LOW) ;	// Off
+    delay (500) ;
+    digitalWrite (LED, HIGH) ;	// On LED Pin - wiringPi pin 0 is BCM_GPIO 17.
+    delay (500) ;		// mS
+    digitalWrite (LED, LOW) ;	// Off
+    delay (500) ;
+        
+  return 0 ;
+}
 

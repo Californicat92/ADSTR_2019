@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
 	
 	//Lectura por comandos de IP del servidor para consultas HTTP y ruta y nombre de la base de datos
 	int opt= 0;
-	char *ip_servidor="172.28.18.16",*ruta_bbdd=".",*nombre_archivo="config.txt";
+	char *ip_servidor="172.28.16.16",*ruta_bbdd=".",*nombre_archivo="config.txt";
 	static struct option long_options[] = {
         {"ip_servidor",		required_argument,	0,	'i'},
         {"nombre_archivo",	required_argument,	0,	'n'},
@@ -165,8 +165,9 @@ int main(int argc, char* argv[]) {
 			insertTable2(db, date, Alarm_description);
 		}
 
-		printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		sleep(seg_lectura);
+		printf("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+		blink(	);
+		sleep(seg_lectura-2);
 	}
 	
 	sqlite3_close(db);
