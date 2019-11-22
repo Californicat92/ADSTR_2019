@@ -7,7 +7,7 @@ Captura: http.o libHTTP.so Basedades.o Funciones.o
 main.o: Basedades.c
 	gcc -c Basedades.c
 
-factorial.o: Funciones.c
+Funciones.o: Funciones.c
 	gcc -c Funciones.c 
 
 libHTTP.so: http.o

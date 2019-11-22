@@ -169,8 +169,8 @@ int callback(void *data, int argc, char **argv, char **azColName){
 	return 0;
 }
 // -----------------------------------------------------------------------------
-
-int openDB(char * name, sqlite3** db){ //Crear o obrir la base de dades.
+//Crear o obrir la base de dades.
+int openDB(char * name, sqlite3** db){
 	int rc;
 	
 	/* Open database */
@@ -194,7 +194,10 @@ int insertTable(sqlite3* db, char* date, float value, int id){
 	
 	 /* Insercion de valores Tabla Lectures_table */
 	
-	sprintf(sql,"INSERT INTO Lectures_table(ID,Date_time_lecture,Value) VALUES (%i,'%s',%f);", id, date, value);// Date_time y value denominacion en la tabla, denominacion de especificador de formato tipo string y float.
+	sprintf(sql,"INSERT INTO Lectures_table(ID,Date_time_lecture,Value) VALUES "\
+				"(%i,'%s',%f);", id, date, value);
+				// Date_time y value denominacion en la tabla, denominacion de
+				// especificador de formato tipo string y float.
 	
 	rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
 
@@ -218,7 +221,7 @@ int insertTable1(sqlite3* db, char* date,int id, char* types, char* description)
 	char *zErrMsg = 0;
 	
 
-			/* Insercion de valores Tabla Sensors_table*/
+	/* Insercion de valores Tabla Sensors_table*/
 	sprintf(sql,"INSERT INTO Sensors_table (ID,Types,Description) VALUES (%i,'%s','%s');", id, types, description);
 	rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
 
