@@ -89,6 +89,7 @@ int main(int argc, char* argv[]) {
 		//Creamos Tabla de Lecturas
 		memset(sql, '\0', sizeof(sql));
 		sprintf(sql,	"CREATE TABLE Lectures_table(" \
+						"ID_row		INTEGER PRIMARY KEY AUTOINCREMENT,"\
 						"ID						INTEGER 	NOT NULL," \
 						"Date_time_lecture		DATE    	NOT NULL," \
 						"Value					INT   		NOT NULL);");
@@ -165,9 +166,8 @@ int main(int argc, char* argv[]) {
 			insertTable2(db, date, Alarm_description);
 		}
 
-		printf("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-		blink(	);
-		sleep(seg_lectura-2);
+		blink(	); //Parpadeo LED en Pin BCM17
+		sleep(seg_lectura-1);
 	}
 	
 	sqlite3_close(db);

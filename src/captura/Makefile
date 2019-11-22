@@ -17,5 +17,5 @@ http.o: http.c
 	gcc -fPIC -c -o http.o  http.c
 
 clean:
-	rm -rf *o *db *gch Captura
+	rm -rf *o *gch Captura
 
