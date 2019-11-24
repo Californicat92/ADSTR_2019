@@ -47,14 +47,6 @@
 */
 int http(char serverName[20], char* nombre_archivo, int *minuts, int *segons){
 	*minuts=0,*segons=0;
-	if (serverName == ""){
-		strcpy(serverName, "172.28.16.16");
-
-	}
-	if (nombre_archivo == ""){
-		nombre_archivo = "config.txt";
-	}
-	
 	
 	struct sockaddr_in	serverAddr;
 	int			sockAddrSize;

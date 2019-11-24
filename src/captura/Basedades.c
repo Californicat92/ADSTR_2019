@@ -61,9 +61,11 @@ int main(int argc, char* argv[]) {
 	
 	char date[100];
 	char date_alarm[100];
+	int cont_alarma=0,iteraciones=0;
 	char Alarm_description[100];
 	int ret = 0;
 	int value_int;
+	int value_data;
 	float value_volts,value_amps;
 	int seg_lectura=10,min_lectura=5;
 	char types[50],sensor_description[100];
@@ -114,22 +116,23 @@ int main(int argc, char* argv[]) {
 		id=1;
 		sprintf(types,"Sensor Tension");
 		sprintf(sensor_description,"Sensor que muestra la lectura de tension de la placa fotovoltaica");
-		insertTable1(db,date,id,types,sensor_description);	
+		insert_Sensors_table(db,date,id,types,sensor_description);	
 
 		// Insertamos sensor de tensión
 		id=2;
 		sprintf(types,"Sensor corriente");
 		sprintf(sensor_description,"Sensor que muestra la lectura de corriente de la batería");
-		insertTable1(db,date,id,types,sensor_description);
+		insert_Sensors_table(db,date,id,types,sensor_description);
 	}
-
+	cont_alarma = min_lectura * 60;
+	cont_alarma = cont_alarma / seg_lectura; //cada X iteraciones buscaremos las alarmas
 
 	while(1){
 		//Estructura de fecha y hora
 		time_t t = time(NULL);
 		struct tm tm = *localtime(&t);
 		sprintf(date,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,
-		tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);	
+		tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);
 		
 		//----Lectura de sensor tensión en bornes de la batería---------
 		ret = spiadc_config_transfer(SINGLE_ENDED_CH2, &value_int);
@@ -141,31 +144,71 @@ int main(int argc, char* argv[]) {
 		value_volts=3.3*value_int/1023; //Conversión a voltaje real
 		id=1;
 
-		insertTable(db,date,value_volts,id);
+		insert_Lectures_table(db,date,value_volts,id);
 
 
 		//----Lectura de sensor intensidad de carga a la batería--------
-		ret = spiadc_config_transfer(DIFERENTIAL_CH0_CH1, &value_int);
+		ret = spiadc_config_transfer(DIFERENTIAL_CH6_CH7, &value_int);
 		
 		value_amps=value_int/(0.5*1023); //Conversión a voltaje real	
 		id = 2;
 		
-		insertTable(db,date,value_amps,id);
+		insert_Lectures_table(db,date,value_amps,id);
 
 		//showTable(db);
 		
 		/*Alarms*/
-					
-		if(value_volts > 2.7){
-			sprintf(Alarm_description,"Exceso de tension");
-			insertTable2(db, date, Alarm_description);
-		}
-		
-		if(value_amps > 1){
-			sprintf(Alarm_description,"Peligro, hay una fuga de corriente");
-			insertTable2(db, date, Alarm_description);
-		}
+		if (cont_alarma >= iteraciones)
+		{
+			iteraciones = 0; // reiniciamos el valor que entra en las alarmas
+			if (tm.tm_min < min_lectura){
+				sprintf(date_alarm,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,
+				tm.tm_year + 1900, tm.tm_hour - 1, tm.tm_min + (60 - min_lectura), tm.tm_sec);
+			} else{
+				sprintf(date_alarm,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,
+				tm.tm_year + 1900, tm.tm_hour, tm.tm_min - min_lectura, tm.tm_sec);
+			}
+			
+			// Buscamos el valor máximo de los valores del sensor 1 recogidos en los 5 min anteriores
+			memset(sql, '\0', sizeof(sql));
+			sprintf(sql, "SELECT MAX(Value) FROM Lectures_table " \
+			"WHERE ID = 1 AND Date_time_lecture > %c",date_alarm);
 
+			/* Execute SQL statement */
+			rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
+			value_data = atoi(data);
+			if(value_data > 2.7){
+				sprintf(Alarm_description,"Exceso de tension");
+				insert_Alarms_table(db, date, Alarm_description);
+			}
+			
+			// Buscamos el valor máximo de los valores del sensor 2 recogidos en los 5 min anteriores
+			memset(sql, '\0', sizeof(sql));
+			sprintf(sql, "SELECT MAX(Value) FROM Lectures_table " \
+			"WHERE ID = 2 AND Date_time_lecture > %c",date_alarm);
+
+			/* Execute SQL statement */
+			rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);	
+			value_data = atoi(data);	
+			if(value_data > 1){
+				sprintf(Alarm_description,"Peligro, hay una fuga de corriente");
+				insert_Alarms_table(db, date, Alarm_description);
+			}
+			
+			// Buscamos el valor mínimo de los valores del sensor 2 recogidos en los 5 min anteriores
+			memset(sql, '\0', sizeof(sql));
+			sprintf(sql, "SELECT MIN(Value) FROM Lectures_table " \
+			"WHERE ID = 2 AND Date_time_lecture > %c",date_alarm);
+
+			/* Execute SQL statement */
+			rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);	
+			value_data = atoi(data);	
+			if(value_data <= 0){
+				sprintf(Alarm_description,"Batería desconectada");
+				insert_Alarms_table(db, date, Alarm_description);
+			}
+		}
+		iteraciones++;
 		blink(	); //Parpadeo LED en Pin BCM17
 		sleep(seg_lectura-1);
 	}

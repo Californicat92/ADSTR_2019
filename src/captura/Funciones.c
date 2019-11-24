@@ -187,7 +187,7 @@ int openDB(char * name, sqlite3** db){
 // -----------------------------------------------------------------------------
 
 //Insertar en la tabla lecture
-int insertTable(sqlite3* db, char* date, float value, int id){
+int insert_Lectures_table(sqlite3* db, char* date, float value, int id){
 	int rc;
 	char sql[500];
 	char *zErrMsg = 0;
@@ -215,7 +215,7 @@ int insertTable(sqlite3* db, char* date, float value, int id){
 }
 // -----------------------------------------------------------------------------
 //Insertar en tabla sensor
-int insertTable1(sqlite3* db, char* date,int id, char* types, char* description){
+int insert_Sensors_table(sqlite3* db, char* date,int id, char* types, char* description){
 	int rc;
 	char sql[500];
 	char *zErrMsg = 0;
@@ -236,7 +236,7 @@ int insertTable1(sqlite3* db, char* date,int id, char* types, char* description)
 }
 // -----------------------------------------------------------------------------
 //Insertar los valores en Alarms_table
-int insertTable2(sqlite3* db, char* date_alarm, char* Alarm_description){
+int insert_Alarms_table(sqlite3* db, char* date_alarm, char* Alarm_description){
 	int rc;
 	char sql[500];
 	char *zErrMsg = 0;
@@ -285,22 +285,22 @@ int showTable(sqlite3* db){
 }
 // -----------------------------------------------------------------------------
 
-int blink (void)
-{
+//~ int blink (void)
+//~ {
   //~ printf ("Raspberry Pi blink\n") ;
 
-  wiringPiSetup () ;
-  pinMode (LED, OUTPUT) ;
+  //~ wiringPiSetup () ;
+  //~ pinMode (LED, OUTPUT) ;
 
-    digitalWrite (LED, HIGH) ;	// On LED Pin - wiringPi pin 0 is BCM_GPIO 17.
-    delay (250) ;		// mS
-    digitalWrite (LED, LOW) ;	// Off
-    delay (250) ;
-    digitalWrite (LED, HIGH) ;	// On LED Pin - wiringPi pin 0 is BCM_GPIO 17.
-    delay (250) ;		// mS
-    digitalWrite (LED, LOW) ;	// Off
-    delay (250) ;
+    //~ digitalWrite (LED, HIGH) ;	// On LED Pin - wiringPi pin 0 is BCM_GPIO 17.
+    //~ delay (250) ;		// mS
+    //~ digitalWrite (LED, LOW) ;	// Off
+    //~ delay (250) ;
+    //~ digitalWrite (LED, HIGH) ;	// On LED Pin - wiringPi pin 0 is BCM_GPIO 17.
+    //~ delay (250) ;		// mS
+    //~ digitalWrite (LED, LOW) ;	// Off
+    //~ delay (250) ;
         
-  return 0 ;
-}
+  //~ return 0 ;
+//~ }
 
