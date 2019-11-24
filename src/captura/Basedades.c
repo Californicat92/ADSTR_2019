@@ -128,7 +128,7 @@ int main(int argc, char* argv[]) {
 	}
 	cont_alarma = min_lectura * 60;
 	cont_alarma = cont_alarma / seg_lectura; //cada X iteraciones buscaremos las alarmas
-	printf("El numero de iteraciones ha de ser: %d",cont_alarma);
+	//~ printf("El numero de iteraciones ha de ser: %d\n",cont_alarma);
 	while(1){
 		//Estructura de fecha y hora
 		time_t t = time(NULL);
