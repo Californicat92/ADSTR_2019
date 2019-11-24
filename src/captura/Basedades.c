@@ -206,17 +206,9 @@ int main(int argc, char* argv[]) {
 			rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
 			value_data = atoi(data);
 
-			memset(sql, '\0', sizeof(sql));
-			sprintf(sql, "SELECT Date_time_lecture FROM Lectures_table " \
-			"WHERE ID = 2 AND Value = %d AND Date_time_lecture > %c",value_data,date_alarm);
-			
-			/* Execute SQL statement */
-			rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
-			sprintf(fecha_alarma, "%c",data);
-							
 			if(value_data <= 0){
 				sprintf(Alarm_description,"Batería desconectada");
-				insert_Alarms_table(db, fecha_alarma, Alarm_description);
+				insert_Alarms_table(db, date, Alarm_description);
 			}
 		}
 		iteraciones++;
