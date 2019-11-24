@@ -285,22 +285,22 @@ int showTable(sqlite3* db){
 }
 // -----------------------------------------------------------------------------
 
-//~ int blink (void)
-//~ {
+int blink (void)
+{
   //~ printf ("Raspberry Pi blink\n") ;
 
-  //~ wiringPiSetup () ;
-  //~ pinMode (LED, OUTPUT) ;
+  wiringPiSetup () ;
+  pinMode (LED, OUTPUT) ;
 
-    //~ digitalWrite (LED, HIGH) ;	// On LED Pin - wiringPi pin 0 is BCM_GPIO 17.
-    //~ delay (250) ;		// mS
-    //~ digitalWrite (LED, LOW) ;	// Off
-    //~ delay (250) ;
-    //~ digitalWrite (LED, HIGH) ;	// On LED Pin - wiringPi pin 0 is BCM_GPIO 17.
-    //~ delay (250) ;		// mS
-    //~ digitalWrite (LED, LOW) ;	// Off
-    //~ delay (250) ;
+    digitalWrite (LED, HIGH) ;	// On LED Pin - wiringPi pin 0 is BCM_GPIO 17.
+    delay (250) ;		// mS
+    digitalWrite (LED, LOW) ;	// Off
+    delay (250) ;
+    digitalWrite (LED, HIGH) ;	// On LED Pin - wiringPi pin 0 is BCM_GPIO 17.
+    delay (250) ;		// mS
+    digitalWrite (LED, LOW) ;	// Off
+    delay (250) ;
         
-  //~ return 0 ;
-//~ }
+  return 0 ;
+}
 

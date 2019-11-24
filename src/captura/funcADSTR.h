@@ -16,7 +16,7 @@
 #include <time.h>
 #include <getopt.h>
 #include "http.h"
-//~ #include <wiringPi.h>
+#include <wiringPi.h>
 
 //ADC configurations segons manual MCP3008
 //~ #define SINGLE_ENDED_CH0 8
