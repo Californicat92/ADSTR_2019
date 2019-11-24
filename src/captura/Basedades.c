@@ -199,15 +199,21 @@ int main(int argc, char* argv[]) {
 			
 			// Buscamos el valor mínimo de los valores del sensor 2 recogidos en los 5 min anteriores
 			memset(sql, '\0', sizeof(sql));
-			sprintf(sql, "SELECT MIN(Value) AND Date_time_lecture FROM Lectures_table " \
+			sprintf(sql, "SELECT MIN(Value) FROM Lectures_table " \
 			"WHERE ID = 2 AND Date_time_lecture > %c",date_alarm);
 			
 			/* Execute SQL statement */
 			rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
-			
+			value_data = atoi(data);
 
-			value_data = atoi(strtok(data, s));
-			fecha_alarma = strtok(NULL, s);		
+			memset(sql, '\0', sizeof(sql));
+			sprintf(sql, "SELECT Date_time_lecturecd FROM Lectures_table " \
+			"WHERE ID = 2 AND MIN(Value) AND Date_time_lecture > %c",date_alarm);
+			
+			/* Execute SQL statement */
+			rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
+			sprintf(fecha_alarma, "%c",data);
+							
 			if(value_data <= 0){
 				sprintf(Alarm_description,"Batería desconectada");
 				insert_Alarms_table(db, fecha_alarma, Alarm_description);
