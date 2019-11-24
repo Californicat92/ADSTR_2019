@@ -207,8 +207,8 @@ int main(int argc, char* argv[]) {
 			value_data = atoi(data);
 
 			memset(sql, '\0', sizeof(sql));
-			sprintf(sql, "SELECT Date_time_lecturecd FROM Lectures_table " \
-			"WHERE ID = 2 AND MIN(Value) AND Date_time_lecture > %c",date_alarm);
+			sprintf(sql, "SELECT Date_time_lecture FROM Lectures_table " \
+			"WHERE ID = 2 AND Value = %d AND Date_time_lecture > %c",value_data,date_alarm);
 			
 			/* Execute SQL statement */
 			rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
