@@ -161,6 +161,9 @@ int spiadc_config_transfer(int conf, int *value){
 // -----------------------------------------------------------------------------
 int callback(void *data, int argc, char **argv, char **azColName){
 	int i;
+	
+	memset((char *)data, '\0', sizeof(data));
+		
 	for(i = 0; i<argc; i++) {
 		sprintf(data, "%s", argv[i] ? argv[i] : "NULL");
 		//printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");

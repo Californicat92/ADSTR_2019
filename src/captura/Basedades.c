@@ -129,6 +129,8 @@ int main(int argc, char* argv[]) {
 		sprintf(types,"Sensor corriente");
 		sprintf(sensor_description,"Sensor que muestra la lectura de corriente de la batería");
 		insert_Sensors_table(db,date,id,types,sensor_description);
+		
+		printf("Creada Base de datos, tablas y sensores");
 	}
 	cont_alarma = min_lectura * 60;
 	cont_alarma = cont_alarma / seg_lectura; //cada X iteraciones buscaremos las alarmas
@@ -166,7 +168,6 @@ int main(int argc, char* argv[]) {
 		/*Alarms*/
 		if (iteraciones >= cont_alarma)
 		{
-			iteraciones = 0; // reiniciamos el valor que entra en las alarmas
 			if (tm.tm_min < min_lectura){
 				sprintf(date_alarm,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,
 				tm.tm_year + 1900, tm.tm_hour - 1, tm.tm_min + (60 - min_lectura), tm.tm_sec);
@@ -207,14 +208,17 @@ int main(int argc, char* argv[]) {
 			"WHERE ID = 2 AND Date_time_lecture > %s",date_alarm);
 			/* Execute SQL statement */
 			rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
-			value_data = atoi(data);
 			
-			printf("\n\n%s\n\n"data);
+			printf("\n\n%s\n\n",data);
 			
+			value_data = atoi(data);	
+			
+					
 			if(value_data <= 0){
 				sprintf(Alarm_description,"Batería desconectada");
 				insert_Alarms_table(db, fecha_alarma, Alarm_description);
 			}
+			iteraciones = 0; // reiniciamos el valor que entra en las alarmas
 		}
 		iteraciones++;
 		blink(	); //Parpadeo LED en Pin BCM17
