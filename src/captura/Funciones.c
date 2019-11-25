@@ -21,7 +21,10 @@
  * 
  */
 
-//Libreria con las demás librerias, declaraciones de variables y funciones
+/**Libreria ADSTR:
+ * Contiene las librerias necesarias, declaraciones de variables y de funciones
+ * que se han creado para este programa, en esta asignatura.
+ **/
 #include "funcADSTR.h"
 
 int verbose = 0;

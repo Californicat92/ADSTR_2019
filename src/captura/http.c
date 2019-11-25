@@ -38,13 +38,11 @@
 
 
 
- /************************
-*
-*
-* tcpClient
-*
-*
-*/
+/**Funcion HTTP:
+ * Con esta funcion, se consigue acceder al servidor que se nos proporciona y
+ * adquirimos los valores necesarios para hacer las capturas y las alarmas.
+ * Esta libreria es dinámica.
+ **/
 int http(char serverName[20], char* nombre_archivo, int *minuts, int *segons){
 	*minuts=0,*segons=0;
 	

@@ -25,13 +25,17 @@
 //Libreria con las demás librerias, declaraciones de variables y funciones
 #include "funcADSTR.h"
 
-/* Secuencia SQL --> No se donde ponerla
- *  SELECT Date_time_lecture FROM Lectures_table WHERE ID = 2 AND Value = (SELECT MIN(Value) FROM Lectures_table)
- */
+/**
+ * Programa principal, en el cual se crean las tablas de la base de datos y se
+ * hace el tratamiento de los datos
+ **/
 
 int main(int argc, char* argv[]) {
 	
-	//Lectura por comandos de IP del servidor para consultas HTTP y ruta y nombre de la base de datos
+	/**Getopt:
+	 * Lectura por comandos de IP del servidor para consultas HTTP, en el
+	 * cual se le pude cambiar la ruta y el nombre de la base de datos
+	 **/
 	int opt= 0;
 	char *ip_servidor="172.28.16.16",*ruta_bbdd=".",*nombre_archivo="config.txt";
 	static struct option long_options[] = {
@@ -78,7 +82,10 @@ int main(int argc, char* argv[]) {
 	int id;
 	sqlite3 *db;
 
-	//Adquirimos datos de cofiguración del archivo config.txt
+	/**Llamada a la funcion http:
+	 * Se adquieren los datos de cofiguración del archivo config.txt, en la
+	 * ip que se pida
+	 **/
 	http(ip_servidor, nombre_archivo, &min_lectura, &seg_lectura);
 	printf("\nHem rebut %i min %i seg\n\n",min_lectura,seg_lectura);
 	
@@ -94,7 +101,7 @@ int main(int argc, char* argv[]) {
 	// Si no hay tablas, se crean
 	if (rc != SQLITE_OK) {
 		
-		//Creamos Tabla de Lecturas
+		/**Creamos Tabla de Lecturas**/
 		memset(sql, '\0', sizeof(sql));
 		sprintf(sql,	"CREATE TABLE Lectures_table(" \
 						"ID_row		INTEGER PRIMARY KEY AUTOINCREMENT,"\
@@ -103,7 +110,7 @@ int main(int argc, char* argv[]) {
 						"Value					INT   		NOT NULL);");
 		rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
 		
-		//Creamos Tabla de Sensores
+		/**Creamos Tabla de Sensores**/
 		memset(sql, '\0', sizeof(sql));
 		sprintf(sql,	"CREATE TABLE Sensors_table("  \
 						"ID						INTEGER 	NOT NULL," \
@@ -111,20 +118,20 @@ int main(int argc, char* argv[]) {
 						"Description			CHAR  		NOT NULL);");
 		rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
 		
-		//Creamos Tabla de Alarmas
+		/**Creamos Tabla de Alarmas**/
 		memset(sql, '\0', sizeof(sql));
 		sprintf(sql,	"CREATE TABLE Alarms_table("  \
 						"Date_time_alarm		DATE    NOT NULL," \
 						"Alarm_description		CHAR    NOT NULL);");
 		rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
 
-		// Insertamos sensor de tensión
+		/**Insertamos sensor de tensión**/
 		id=1;
 		sprintf(types,"Sensor Tension");
 		sprintf(sensor_description,"Sensor que muestra la lectura de tension de la placa fotovoltaica");
 		insert_Sensors_table(db,date,id,types,sensor_description);	
 
-		// Insertamos sensor de tensión
+		/**Insertamos sensor de tensión**/
 		id=2;
 		sprintf(types,"Sensor corriente");
 		sprintf(sensor_description,"Sensor que muestra la lectura de corriente de la batería");
@@ -135,6 +142,10 @@ int main(int argc, char* argv[]) {
 	cont_alarma = min_lectura * 60;
 	cont_alarma = cont_alarma / seg_lectura; //cada X iteraciones buscaremos las alarmas
 	//~ printf("El numero de iteraciones ha de ser: %d\n",cont_alarma);
+	/**Iteración para adquir los datos en el tiempo deseado (segun config.txt).
+	 * Se tratan los datos y se imprime por pantalla, los datos que se
+	 * adquieren de los sensores
+	 **/
 	while(1){
 		//Estructura de fecha y hora
 		time_t t = time(NULL);
@@ -166,6 +177,11 @@ int main(int argc, char* argv[]) {
 		//showTable(db);
 		
 		/*Alarms*/
+		/**Iteración de alaramas:
+		 * Cada cierto tiempo, dado por el archivo de configuración en
+		 * el servidor que se nos proporciona, obtenemos una alarma si
+		 * ciertos valores superan unos limites
+		 **/
 		if (iteraciones >= cont_alarma)
 		{
 			if (tm.tm_min < min_lectura){
