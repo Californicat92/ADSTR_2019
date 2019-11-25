@@ -208,8 +208,11 @@ int main(int argc, char* argv[]) {
 			"WHERE ID = 2 AND Date_time_lecture > '%s'",date_alarm);
 			/* Execute SQL statement */
 			rc = sqlite3_exec(db, sql, alarmas_vals, (void *)data, &zErrMsg);
+
+			value_data = strtok(data, s);
+			*fecha_alarma = strtok(NULL, s);
 			
-			printf("\n\n%s\n\n",data);
+			printf("\n\n%s  %s\n\n",value_data, *fecha_alarma);
 			
 			value_data = atoi(data);	
 			
