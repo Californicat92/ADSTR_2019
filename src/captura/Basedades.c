@@ -130,7 +130,7 @@ int main(int argc, char* argv[]) {
 		sprintf(sensor_description,"Sensor que muestra la lectura de corriente de la batería");
 		insert_Sensors_table(db,date,id,types,sensor_description);
 		
-		printf("Creada Base de datos, tablas y sensores");
+		printf("Creada Base de datos, tablas y sensores\n");
 	}
 	cont_alarma = min_lectura * 60;
 	cont_alarma = cont_alarma / seg_lectura; //cada X iteraciones buscaremos las alarmas
@@ -205,7 +205,7 @@ int main(int argc, char* argv[]) {
 			// Buscamos el valor mínimo de los valores del sensor 2 recogidos en los 5 min anteriores
 			memset(sql, '\0', sizeof(sql));
 			sprintf(sql, "SELECT MIN(Value),Date_time_lecture FROM Lectures_table " \
-			"WHERE ID = 2 AND Date_time_lecture > %s",date_alarm);
+			"WHERE ID = 2 AND Date_time_lecture > '%s'",date_alarm);
 			/* Execute SQL statement */
 			rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
 			
