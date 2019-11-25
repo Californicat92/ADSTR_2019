@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
 	char date_alarm[100];
 	int cont_alarma=0,iteraciones=0;
 	char Alarm_description[100];
-	char *fecha_alarma=0;
+	char *fecha_alarma, *valAlarm, *dateAlarm;
 	const char 	s[2] = "|";
 	int ret = 0;
 	int value_int;
@@ -209,17 +209,15 @@ int main(int argc, char* argv[]) {
 			/* Execute SQL statement */
 			rc = sqlite3_exec(db, sql, alarmas_vals, (void *)data, &zErrMsg);
 
-			value_data = strtok(data, s);
-			*fecha_alarma = strtok(NULL, s);
+			valAlarm = strtok(data, s);
+			dateAlarm = strtok(NULL, s);
+			value_data = atoi(valAlarm);
 			
-			printf("\n\n%s  %s\n\n",value_data, *fecha_alarma);
-			
-			value_data = atoi(data);	
-			
-					
+			printf("\n\n%s  %s\n\n", valAlarm, dateAlarm);
+				
 			if(value_data <= 0){
 				sprintf(Alarm_description,"Batería desconectada");
-				insert_Alarms_table(db, fecha_alarma, Alarm_description);
+				insert_Alarms_table(db, dateAlarm, Alarm_description);
 			}
 			iteraciones = 0; // reiniciamos el valor que entra en las alarmas
 		}
