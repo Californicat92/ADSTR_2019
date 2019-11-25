@@ -207,7 +207,7 @@ int main(int argc, char* argv[]) {
 			sprintf(sql, "SELECT MIN(Value),Date_time_lecture FROM Lectures_table " \
 			"WHERE ID = 2 AND Date_time_lecture > '%s'",date_alarm);
 			/* Execute SQL statement */
-			rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
+			rc = sqlite3_exec(db, sql, alarmas_vals, (void *)data, &zErrMsg);
 			
 			printf("\n\n%s\n\n",data);
 			

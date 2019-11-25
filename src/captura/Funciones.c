@@ -172,6 +172,22 @@ int callback(void *data, int argc, char **argv, char **azColName){
 	return 0;
 }
 // -----------------------------------------------------------------------------
+//Devuelve dos valores 
+int alarmas_vals(void *data, int argc, char **argv, char **azColName){
+	char val1, val2;
+	int i;
+	
+	memset((char *)data, '\0', sizeof(data));
+		
+	//~ for(i = 0; i<argc; i++) {
+		//~ sprintf(data, "%s", argv[i] ? argv[i] : "NULL");
+		//~ //printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+   //~ }
+	sprintf(data, "%s|%s", argv[0], argv[1]);
+	printf("\n");
+	return 0;
+}
+// -----------------------------------------------------------------------------
 //Crear o obrir la base de dades.
 int openDB(char * name, sqlite3** db){
 	int rc;

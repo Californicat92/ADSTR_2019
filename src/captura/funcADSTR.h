@@ -45,6 +45,7 @@ void spiadc_config_tx(int conf, uint8_t tx[3]);
 int spiadc_transfer(int fd, uint8_t bits, uint32_t speed, uint16_t delay, uint8_t tx[3], uint8_t *rx, int len);
 int spiadc_config_transfer( int conf, int *value);
 int callback(void *data, int argc, char **argv, char **azColName);
+int alarmas_vals(void *data, int argc, char **argv, char **azColName);
 int openDB(char * name, sqlite3** db); //Crear o obrir la base de dades
 int insert_Lectures_table(sqlite3* db, char* date, float value, int id);
 int insert_Sensors_table(sqlite3* db, char* date,int id, char* types, char* description);
