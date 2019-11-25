@@ -25,7 +25,7 @@
 //Libreria con las demás librerias, declaraciones de variables y funciones
 #include "funcADSTR.h"
 
-/* Secuencia SQL --> No se donde ponerla XDD
+/* Secuencia SQL --> No se donde ponerla
  *  SELECT Date_time_lecture FROM Lectures_table WHERE ID = 2 AND Value = (SELECT MIN(Value) FROM Lectures_table)
  */
 
