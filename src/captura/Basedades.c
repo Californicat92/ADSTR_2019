@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 	char date_alarm[100];
 	int cont_alarma=0,iteraciones=0;
 	char Alarm_description[100];
-	char *fecha_alarma;
+	char *fecha_alarma=0;
 	const char 	s[2] = "|";
 	int ret = 0;
 	int value_int;
@@ -174,7 +174,7 @@ int main(int argc, char* argv[]) {
 			// Buscamos el valor máximo de los valores del sensor 1 recogidos en los 5 min anteriores
 			memset(sql, '\0', sizeof(sql));
 			sprintf(sql, "SELECT MAX(Value) FROM Lectures_table " \
-			"WHERE ID = 1 AND Date_time_lecture > %c",date_alarm);
+			"WHERE ID = 1 AND Date_time_lecture > %s",date_alarm);
 
 			/* Execute SQL statement */
 			rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
@@ -187,7 +187,7 @@ int main(int argc, char* argv[]) {
 			// Buscamos el valor máximo de los valores del sensor 2 recogidos en los 5 min anteriores
 			memset(sql, '\0', sizeof(sql));
 			sprintf(sql, "SELECT MAX(Value) FROM Lectures_table " \
-			"WHERE ID = 2 AND Date_time_lecture > %c",date_alarm);
+			"WHERE ID = 2 AND Date_time_lecture > %s",date_alarm);
 
 			/* Execute SQL statement */
 			rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);	
@@ -199,16 +199,17 @@ int main(int argc, char* argv[]) {
 			
 			// Buscamos el valor mínimo de los valores del sensor 2 recogidos en los 5 min anteriores
 			memset(sql, '\0', sizeof(sql));
-			sprintf(sql, "SELECT MIN(Value) FROM Lectures_table " \
-			"WHERE ID = 2 AND Date_time_lecture > %c",date_alarm);
-			
+			sprintf(sql, "SELECT MIN(Value),Date_time_lecture FROM Lectures_table " \
+			"WHERE ID = 2 AND Date_time_lecture > %s",date_alarm);
 			/* Execute SQL statement */
 			rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
 			value_data = atoi(data);
-
+			
+			printf("\n\n%s\n\n"data);
+			
 			if(value_data <= 0){
 				sprintf(Alarm_description,"Batería desconectada");
-				insert_Alarms_table(db, date, Alarm_description);
+				insert_Alarms_table(db, fecha_alarma, Alarm_description);
 			}
 		}
 		iteraciones++;
