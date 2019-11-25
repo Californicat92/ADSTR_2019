@@ -25,6 +25,10 @@
 //Libreria con las demás librerias, declaraciones de variables y funciones
 #include "funcADSTR.h"
 
+/* Secuencia SQL --> No se donde ponerla XDD
+ *  SELECT Date_time_lecture FROM Lectures_table WHERE ID = 2 AND Value = (SELECT MIN(Value) FROM Lectures_table)
+ */
+
 int main(int argc, char* argv[]) {
 	
 	//Lectura por comandos de IP del servidor para consultas HTTP y ruta y nombre de la base de datos
@@ -69,8 +73,8 @@ int main(int argc, char* argv[]) {
 	int value_int;
 	int value_data;
 	float value_volts,value_amps;
-	int seg_lectura=10,min_lectura=5;
-	char types[50],sensor_description[100];
+	int seg_lectura=10, min_lectura=5;
+	char types[50], sensor_description[100];
 	int id;
 	sqlite3 *db;
 
