@@ -149,7 +149,7 @@ int main(int argc, char* argv[]) {
 		//printf("valor llegit (0-1023) %d\n", value_int);
 		//fprintf(stdout, "%lu\n", (unsigned long)t);
 		
-		value_volts=15.2*value_int/1023; //Conversión a voltaje real
+		value_volts=24*value_int/1023; //Conversión a voltaje real
 		id=1;
 
 		insert_Lectures_table(db,date,value_volts,id);
@@ -158,12 +158,11 @@ int main(int argc, char* argv[]) {
 		//----Lectura de sensor intensidad de carga a la batería--------
 		ret = spiadc_config_transfer(DIFERENTIAL_CH0_CH1, &value_int);
 		
-		value_amps=value_int*6.5; //Conversión a voltaje real	
+		value_amps=value_int*4.65; //Conversión a voltaje real	
 		id = 2;
-		printf("%d",value_int);
 		insert_Lectures_table(db,date,value_amps,id);
 
-		printf("Tension:%0.3f - Intensidad:%0.3f\n", value_volts, value_amps);
+		printf("Tension:%0.3f V - Intensidad:%0.f mA\n", value_volts, value_amps);
 
 		//showTable(db);
 		
