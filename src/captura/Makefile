@@ -1,8 +1,11 @@
 all: Captura
 
+exec:
+	LD_LIBRARY_PATH=. ./Captura -i 192.168.11.175 -n config.txt -r /home/pi/Desktop/ADSTR_2019/src/captura/captura.db
+
 Captura: http.o libHTTP.so Basedades.o Funciones.o 
 	gcc Basedades.o Funciones.o -o Captura -lsqlite3 -L. -lHTTP -lwiringPi
-	LD_LIBRARY_PATH=. ./Captura -i 172.28.16.16 -n config.txt -r /home/pi/Desktop/ADSTR_2019/src/captura/captura.db
+	LD_LIBRARY_PATH=. ./Captura -i 192.168.11.175 -n config.txt -r /home/pi/Desktop/ADSTR_2019/src/captura/captura.db
 
 main.o: Basedades.c
 	gcc -c Basedades.c

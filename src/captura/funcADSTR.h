@@ -27,13 +27,13 @@
 //~ #define SINGLE_ENDED_CH5 13
 //~ #define SINGLE_ENDED_CH6 14
 //~ #define SINGLE_ENDED_CH7 15
-//~ #define DIFERENTIAL_CH0_CH1 0 //Chanel CH0 = IN+ CH1 = IN-
+#define DIFERENTIAL_CH0_CH1 0 //Chanel CH0 = IN+ CH1 = IN-
 //~ #define DIFERENTIAL_CH1_CH0 1 //Chanel CH0 = IN- CH1 = IN+
 //~ #define DIFERENTIAL_CH2_CH3 2 //Chanel CH2 = IN+ CH3 = IN-
 //~ #define DIFERENTIAL_CH3_CH2 3 //Chanel CH2 = IN- CH3 = IN+
 //~ #define DIFERENTIAL_CH4_CH5 4 //Chanel CH4 = IN+ CH5 = IN-
 //~ #define DIFERENTIAL_CH5_CH4 5 //Chanel CH4 = IN- CH5 = IN+
- #define DIFERENTIAL_CH6_CH7 6 //Chanel CH6 = IN+ CH7 = IN-
+// #define DIFERENTIAL_CH6_CH7 6 //Chanel CH6 = IN+ CH7 = IN-
 //~ #define DIFERENTIAL_CH7_CH6 7 //Chanel CH6 = IN- CH7 = IN+
 
 #define	LED	0 // LED Pin - wiringPi pin 0 is BCM_GPIO 17.
