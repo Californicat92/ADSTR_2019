@@ -1,4 +1,4 @@
-all: Captura
+all: Captura //Fita 2
 
 exec:
 	LD_LIBRARY_PATH=. ./Captura -i 192.168.11.175 -n config.txt -r /home/pi/Desktop/ADSTR_2019/src/captura/captura.db

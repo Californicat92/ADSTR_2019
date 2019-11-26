@@ -1,3 +1,5 @@
+//Fita 2
+
 /*
  * Funciones.c
  * 

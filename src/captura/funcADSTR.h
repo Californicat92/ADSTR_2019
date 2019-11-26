@@ -1,3 +1,5 @@
+//Fita 2
+
 #ifndef funcADSTH_H
 #define funcADSTR_H
 
