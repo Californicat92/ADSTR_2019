@@ -20,6 +20,10 @@
 #include "http.h"
 #include <wiringPi.h>
 
+#include <pthread.h>
+#include <signal.h>
+#include <sys/time.h>
+
 //ADC configurations segons manual MCP3008
 //~ #define SINGLE_ENDED_CH0 8
 //~ #define SINGLE_ENDED_CH1 9
