@@ -80,8 +80,12 @@ int main(int argc, char* argv[]) {
 	int id;
 	sqlite3 *db;
 
-
 	//TIMER
+	timer_t alarm;
+	//set_timer(timer_t * timer_id, float delay, float interval, timer_callback * func, void * data) 
+    set_timer(&alarm, &min_lectura, &seg_lectura, comprobar_alarmas, (void *) "tick" );
+    
+    
 	////Adquirimos datos de configuración del archivo config.txt
 	http(ip_servidor, nombre_archivo, &min_lectura, &seg_lectura);
 	printf("\nHem rebut %i min %i seg\n\n",min_lectura,seg_lectura);
@@ -170,7 +174,10 @@ int main(int argc, char* argv[]) {
 
 		//showTable(db);
 		
-		/*Alarms*/
+	/*Alarms*/
+	//funcion que llama el timer
+	void comprobar_alarmas{
+			
 		if (iteraciones >= cont_alarma)
 		{
 			if (tm.tm_min < min_lectura){
