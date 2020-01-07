@@ -126,7 +126,7 @@ int main(int argc, char* argv[]) {
 		sprintf(sensor_description,"Sensor que muestra la lectura de tension de la placa fotovoltaica");
 		insert_Sensors_table(db,date,id,types,sensor_description);	
 
-		// Insertamos sensor de tensión
+		// Insertamos sensor de corriente
 		id=2;
 		sprintf(types,"Sensor corriente");
 		sprintf(sensor_description,"Sensor que muestra la lectura de corriente de la batería");
