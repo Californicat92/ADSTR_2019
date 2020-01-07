@@ -83,8 +83,7 @@ int main(int argc, char* argv[]) {
 	//TIMER
 	timer_t alarm;
 	//set_timer(timer_t * timer_id, float delay, float interval, timer_callback * func, void * data) 
-    set_timer(&alarm, &min_lectura, &seg_lectura, comprobar_alarmas, (void *) "tick" );
-    
+    set_timer(&alarm, &min_lectura, &seg_lectura, comprobar_alarmas, (void *) "valores" );//&valores_sensor );
     
 	////Adquirimos datos de configuración del archivo config.txt
 	http(ip_servidor, nombre_archivo, &min_lectura, &seg_lectura);
@@ -140,12 +139,10 @@ int main(int argc, char* argv[]) {
 		
 		printf("Creada Base de datos, tablas y sensores\n");
 	}
-	//~ cont_alarma = min_lectura * 60;
-	//~ cont_alarma = cont_alarma / seg_lectura; //cada X iteraciones buscaremos las alarmas
-	//~ printf("El numero de iteraciones ha de ser: %d\n",cont_alarma);
+	
 	while(1){
 		//Estructura de fecha y hora
-		time_t t = time(NULL); // MIRAR QUE ES PARA QUE NO HAYA INCOMPATIBILIDAD CON time_t alarms
+		time_t t = time(NULL);
 		struct tm tm = *localtime(&t);
 		sprintf(date,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,
 		tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);
@@ -171,67 +168,7 @@ int main(int argc, char* argv[]) {
 		insert_Lectures_table(db,date,value_amps,id);
 
 		printf("Tension:%0.3f V - Intensidad:%0.f mA\n", value_volts, value_amps);
-
-		//showTable(db);
-		
-	/*Alarms*/			
-		//{
-			//if (tm.tm_min < min_lectura){
-				//sprintf(date_alarm,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,
-				//tm.tm_year + 1900, tm.tm_hour - 1, tm.tm_min + (60 - min_lectura), tm.tm_sec);
-			//} else{
-				//sprintf(date_alarm,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,
-				//tm.tm_year + 1900, tm.tm_hour, tm.tm_min - min_lectura, tm.tm_sec);
-			//}
 			
-			//// Buscamos el valor máximo de los valores del sensor 1 recogidos en los 5 min anteriores
-			//memset(sql, '\0', sizeof(sql));
-			//sprintf(sql, "SELECT MAX(Value) FROM Lectures_table " \
-			//"WHERE ID = 1 AND Date_time_lecture > %s",date_alarm);
-
-			///* Execute SQL statement */
-			//rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
-			//value_data = atoi(data);
-			//if(value_data > 2.7){ //modificar para que el 2,7 se pueda introducir desde timer data
-				//sprintf(Alarm_description,"Exceso de tension");
-				//insert_Alarms_table(db, date, Alarm_description);
-			//}
-			
-			//// Buscamos el valor máximo de los valores del sensor 2 recogidos en los 5 min anteriores
-			//memset(sql, '\0', sizeof(sql));
-			//sprintf(sql, "SELECT MAX(Value) FROM Lectures_table " \
-			//"WHERE ID = 2 AND Date_time_lecture > %s",date_alarm);
-
-			///* Execute SQL statement */
-			//rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);	
-			//value_data = atoi(data);	
-			//if(value_data > 1){ //modificar para que el 2,7 se pueda introducir desde timer data
-				//sprintf(Alarm_description,"Peligro, hay una fuga de corriente");
-				//insert_Alarms_table(db, date, Alarm_description);
-			//}
-			
-			//// Buscamos el valor mínimo de los valores del sensor 2 recogidos en los 5 min anteriores
-			//memset(sql, '\0', sizeof(sql));
-			//sprintf(sql, "SELECT MIN(Value),Date_time_lecture FROM Lectures_table " \
-			//"WHERE ID = 2 AND Date_time_lecture > '%s'",date_alarm);
-			///* Execute SQL statement */
-			//rc = sqlite3_exec(db, sql, alarmas_vals, (void *)data, &zErrMsg);
-
-			//valAlarm = strtok(data, s);
-			//dateAlarm = strtok(NULL, s);
-			//value_data = atoi(valAlarm);
-			
-			//printf("\n\n%s  %s\n\n", valAlarm, dateAlarm);
-				
-			//if(value_data <= 0){
-				//sprintf(Alarm_description,"Batería desconectada");
-				//insert_Alarms_table(db, dateAlarm, Alarm_description);
-			//}
-			////~ iteraciones = 0; // reiniciamos el valor que entra en las alarmas
-		//}
-		//iteraciones++;
-		//blink(	); //Parpadeo LED en Pin BCM17
-		//sleep(seg_lectura-1);
 	}
 	
 	sqlite3_close(db);
@@ -239,58 +176,62 @@ int main(int argc, char* argv[]) {
 }
 
 //funcion que llama el timer
-void comprobar_alarmas //(datos para comprobar valores maximos minimos medias etc...)
+void comprobar_alarmas (union sigval si) //(datos para comprobar valores maximos minimos etc...)
 {
-	if (tm.tm_min < min_lectura){
-		sprintf(date_alarm,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,
-		tm.tm_year + 1900, tm.tm_hour - 1, tm.tm_min + (60 - min_lectura), tm.tm_sec);
-	} 
-	else{
-		sprintf(date_alarm,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,
-		tm.tm_year + 1900, tm.tm_hour, tm.tm_min - min_lectura, tm.tm_sec);
-	}
+	void * msg = (void *) si.sival_ptr;
+	
+	printf("valor = %d\n", msg);
+	
+	//if (tm.tm_min < min_lectura){
+		//sprintf(date_alarm,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,
+		//tm.tm_year + 1900, tm.tm_hour - 1, tm.tm_min + (60 - min_lectura), tm.tm_sec);
+	//} 
+	//else{
+		//sprintf(date_alarm,"%d-%d-%d %d:%d:%d", tm.tm_mday, tm.tm_mon + 1,
+		//tm.tm_year + 1900, tm.tm_hour, tm.tm_min - min_lectura, tm.tm_sec);
+	//}
 			
-	// Buscamos el valor máximo de los valores del sensor 1 recogidos en los 5 min anteriores
-	memset(sql, '\0', sizeof(sql));
-	sprintf(sql, "SELECT MAX(Value) FROM Lectures_table " \
-	"WHERE ID = 1 AND Date_time_lecture > %s",date_alarm);
+	//// Buscamos el valor máximo de los valores del sensor 1 recogidos en los 5 min anteriores
+	//memset(sql, '\0', sizeof(sql));
+	//sprintf(sql, "SELECT MAX(Value) FROM Lectures_table " \
+	//"WHERE ID = 1 AND Date_time_lecture > %s",date_alarm);
 
-	/* Execute SQL statement */
-	rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
-	value_data = atoi(data);
-	if(value_data > 2.7){ //modificar para que el 2,7 se pueda introducir desde timer data
-		sprintf(Alarm_description,"Exceso de tension");
-		insert_Alarms_table(db, date, Alarm_description);
-	}
+	///* Execute SQL statement */
+	//rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
+	//value_data = atoi(data);
+	//if(value_data > 2.7){ //modificar para que el 2,7 se pueda introducir desde timer data
+		//sprintf(Alarm_description,"Exceso de tension");
+		//insert_Alarms_table(db, date, Alarm_description);
+	//}
 	
-	// Buscamos el valor máximo de los valores del sensor 2 recogidos en los 5 min anteriores
-	memset(sql, '\0', sizeof(sql));
-	sprintf(sql, "SELECT MAX(Value) FROM Lectures_table " \
-	"WHERE ID = 2 AND Date_time_lecture > %s",date_alarm);
+	//// Buscamos el valor máximo de los valores del sensor 2 recogidos en los 5 min anteriores
+	//memset(sql, '\0', sizeof(sql));
+	//sprintf(sql, "SELECT MAX(Value) FROM Lectures_table " \
+	//"WHERE ID = 2 AND Date_time_lecture > %s",date_alarm);
 
-	/* Execute SQL statement */
-	rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);	
-	value_data = atoi(data);	
-	if(value_data > 1){ //modificar para que el 2,7 se pueda introducir desde timer data
-		sprintf(Alarm_description,"Peligro, hay una fuga de corriente");
-		insert_Alarms_table(db, date, Alarm_description);
-	}
+	///* Execute SQL statement */
+	//rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);	
+	//value_data = atoi(data);	
+	//if(value_data > 1){ //modificar para que el 2,7 se pueda introducir desde timer data
+		//sprintf(Alarm_description,"Peligro, hay una fuga de corriente");
+		//insert_Alarms_table(db, date, Alarm_description);
+	//}
 	
-	// Buscamos el valor mínimo de los valores del sensor 2 recogidos en los 5 min anteriores
-	memset(sql, '\0', sizeof(sql));
-	sprintf(sql, "SELECT MIN(Value),Date_time_lecture FROM Lectures_table " \
-	"WHERE ID = 2 AND Date_time_lecture > '%s'",date_alarm);
-	/* Execute SQL statement */
-	rc = sqlite3_exec(db, sql, alarmas_vals, (void *)data, &zErrMsg);
+	//// Buscamos el valor mínimo de los valores del sensor 2 recogidos en los 5 min anteriores
+	//memset(sql, '\0', sizeof(sql));
+	//sprintf(sql, "SELECT MIN(Value),Date_time_lecture FROM Lectures_table " \
+	//"WHERE ID = 2 AND Date_time_lecture > '%s'",date_alarm);
+	///* Execute SQL statement */
+	//rc = sqlite3_exec(db, sql, alarmas_vals, (void *)data, &zErrMsg);
 
-	valAlarm = strtok(data, s);
-	dateAlarm = strtok(NULL, s);
-	value_data = atoi(valAlarm);
+	//valAlarm = strtok(data, s);
+	//dateAlarm = strtok(NULL, s);
+	//value_data = atoi(valAlarm);
 	
-	printf("\n\n%s  %s\n\n", valAlarm, dateAlarm);
+	//printf("\n\n%s  %s\n\n", valAlarm, dateAlarm);
 		
-	if(value_data <= 0){
-		sprintf(Alarm_description,"Batería desconectada");
-		insert_Alarms_table(db, dateAlarm, Alarm_description);
-	}
+	//if(value_data <= 0){
+		//sprintf(Alarm_description,"Batería desconectada");
+		//insert_Alarms_table(db, dateAlarm, Alarm_description);
+	//}
 }
