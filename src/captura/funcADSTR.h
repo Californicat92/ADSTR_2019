@@ -58,6 +58,7 @@ int insert_Sensors_table(sqlite3* db, char* date,int id, char* types, char* desc
 int insert_Alarms_table(sqlite3* db, char* date_alarm, char* Alarm_description);
 int showTable(sqlite3* db); //Mostrat por pantalla el contenido de la base de datos.
 int blink (void);
+int set_timer(timer_t * timer_id, float delay, float interval, timer_callback * func, void * data);
 // -----------------------------------------------------------------------------
 
 #endif
