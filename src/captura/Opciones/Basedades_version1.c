@@ -83,8 +83,8 @@ int main(int argc, char* argv[]) {
 
 	//TIMER
 	////Adquirimos datos de configuración del archivo config.txt
-	//http(ip_servidor, nombre_archivo, &min_lectura, &seg_lectura);
-	//printf("\nHem rebut %i min %i seg\n\n",min_lectura,seg_lectura);
+	http(ip_servidor, nombre_archivo, &min_lectura, &seg_lectura);
+	printf("\nHem rebut %i min %i seg\n\n",min_lectura,seg_lectura);
 	
 	openDB(ruta_bbdd, &db);
 	
