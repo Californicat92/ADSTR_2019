@@ -186,7 +186,7 @@ int comunicacio(char buffer_rebut[], char buffer_enviat[]){
 							 //database_minimo(minimo,fecha_hora_actual,id, fecha_hora_despues);
 							 
 							//~ sprintf(buffer_enviat,"{C%s}",fecha_hora_actual);
-							sprintf(buffer_enviat,"{A_01_%s_30_10.10_%s_1.50_%s_5.55}",fecha_hora_actual,fecha_hora_actual,fecha_hora_actual);
+							sprintf(buffer_enviat,"{A#01#%s#30#10.10#%s#1.50#%s#5.55}",fecha_hora_actual,fecha_hora_actual,fecha_hora_actual);
 							//sprintf(buffer_enviat,"{C%s/%s/%s_%s:%s:%s_%s_%2.2s_%s_%s}", year,mes,dia,hora,min,seg, contador, media,maximo,minimo);
 											
 

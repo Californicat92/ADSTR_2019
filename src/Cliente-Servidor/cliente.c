@@ -55,7 +55,7 @@ void ImprimirMenu(void);
 int callback(void *data, int argc, char **argv, char **azColName);
 int openDB(char * name, sqlite3** db); //Crear o obrir la base de dades
 int insert_Sensors_table(sqlite3* db,int ID, char* Tipo_sensor,char* Unitat_de_mesura, char* Descripcio_sensor, char* Localitzacio_sensor,int intervalo, char* IP);
-
+int insert_Resum_table(sqlite3* db,int ID2, char* Data_inici,int Increment_de_temps, float Maxim,char* Data_maxim,float Minim,char* Data_minim,float Mitjana);
  /************************
 *
 *
@@ -105,7 +105,10 @@ int main(int argc, char *argv[]){
  	int max_sensores=0;
  	char data_inici[200];
  	openDB(ruta_bbdd, &db);
-	
+	const char 	s[2] = "#";
+	char *Data_inici,*Data_Maxim,*Data_Minim;
+	int ID2, Increment_de_temps;
+	float Maxim,Minim,Mitjana;
 	// Comprobacion si hay tablas ya creadas en la base de datos
 	memset(sql, '\0', sizeof(sql));
 	sprintf(sql, "SELECT * FROM Sensors");
@@ -202,18 +205,8 @@ int main(int argc, char *argv[]){
 		insert_Sensors_table(db,ID,Tipo_sensor,Unitat_de_mesura,Descripcio_sensor,Localitzacio_sensor,intervalo,IP);
 	} else printf("Tabla ya creada \n");
 
-
-
 	ImprimirMenu();
 	scanf("%s", &input);
-
-	// Buscamos el valor máximo de sensores que tenemos
-	memset(sql, '\0', sizeof(sql));
-	sprintf(sql, "SELECT MAX(ID_row) FROM Sensors");
-
-	/* Execute SQL statement */
-	rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
-	max_sensores = atoi(data);
 	while (input != 's')
 	{
 		memset (enviat,'\0',200);
@@ -222,12 +215,21 @@ int main(int argc, char *argv[]){
 		{
 			case '1':
 				printf("Heu seleccionat l'opció 1\n");
+				// Buscamos el valor máximo de sensores que tenemos
+				memset(sql, '\0', sizeof(sql));
+				sprintf(sql, "SELECT MAX(ID_row) FROM Sensors");
+
+				/* Execute SQL statement */
+				rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
+				max_sensores = atoi(data);
 				for (int i = 0; i < max_sensores; i++)
-				{
+				{	
+
+					//Buscamos la ultima fecha guardada
 					sprintf(sql, "SELECT MAX(Data_inici) FROM Resum WHERE ID_row = %i;",i);
 					rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
 					sprintf(data_inici,"%s",data);
-					int ret = strncmp("2020", data_inici, 4);
+					int ret = strncmp("2019/12/31_00:00:00", data_inici, 10	);
 					if(ret > 0)
 					{
 						sprintf(data_inici,"2020/01/01_00:00:00");
@@ -240,9 +242,20 @@ int main(int argc, char *argv[]){
 					ID = atoi(data);
 					sprintf(enviat,"{A_%s_%i_%i}",data_inici, intervalo, ID); //cargem a la variable a enviar les dades
 					E_R_Datos(enviat, rebut);
-					printf("\nS'ha rebut el codi: %s\n",rebut);	
-					
-					
+					printf("\nS'ha rebut el codi: %s\n",rebut);
+					ret = strncmp("{ERROR_PARAMETRO INICIAL}", rebut, 10	);
+					if(ret > 0)
+					{
+					ID2 = atoi(strtok(rebut, s));
+					Data_inici = strtok(NULL, s);
+					Increment_de_temps = atoi(strtok(NULL, s));
+					Maxim = atof(strtok(NULL, s));
+					Data_Maxim = strtok(NULL, s);
+					Minim = atof(strtok(NULL, s));
+					Data_Minim = strtok(NULL, s);
+					Mitjana = atof(strtok(NULL, s));
+					insert_Resum_table(db,ID2,Data_inici,Increment_de_temps,Maxim,Data_Maxim,Minim,Data_Minim,Mitjana);
+					}
 					memset (enviat,'\0',200);
 					memset (rebut,'\0',200);
 				}
@@ -377,7 +390,27 @@ int insert_Sensors_table(sqlite3* db,int ID, char* Tipo_sensor,char* Unitat_de_m
 	
 
 	/* Insercion de valores Tabla Sensors_table*/
-	sprintf(sql,"INSERT INTO Sensors (ID,Tipo_sensor,Unitat_de_mesura,Descripcio_sensor,Localitzacio_sensor,intervalo,IP) VALUES (%i,'%s','%s','%s','%s','%i','%s');", ID, Tipo_sensor, Unitat_de_mesura, Descripcio_sensor, Localitzacio_sensor, intervalo, IP);
+	sprintf(sql,"INSERT INTO Sensors (ID,Tipo_sensor,Unitat_de_mesura,Descripcio_sensor,Localitzacio_sensor,intervalo,IP) VALUES (%i,'%s','%s','%s','%s',%i,'%s');", ID, Tipo_sensor, Unitat_de_mesura, Descripcio_sensor, Localitzacio_sensor, intervalo, IP);
+	rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
+
+	if( rc != SQLITE_OK ){
+		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		sqlite3_free(zErrMsg);
+
+		return 1;
+			
+		}
+	return 0;	   
+}
+//Insertar en tabla sensor
+int insert_Resum_table(sqlite3* db,int ID2, char* Data_inici,int Increment_de_temps, float Maxim,char* Data_maxim,float Minim,char* Data_minim,float Mitjana){
+	int rc;
+	char sql[500];
+	char *zErrMsg = 0;
+	
+
+	/* Insercion de valores Tabla Sensors_table*/
+	sprintf(sql,"INSERT INTO Resum (ID,Data_inici,Increment_de_temps,Maxim,Data_maxim,Minim,Data_minim,Mitjana) VALUES (%i,'%s',%i,%f,'%s',%f,'%s',%f);", ID2, Data_inici, Increment_de_temps, Maxim,Data_maxim,Minim,Data_minim,Mitjana);
 	rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
 
 	if( rc != SQLITE_OK ){
