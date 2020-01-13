@@ -1,4 +1,4 @@
-/**
+Images/**
  * @file			informe.c
  * @brief			Trabajar una base da datos para generar un informe
  * @package			ADSTR

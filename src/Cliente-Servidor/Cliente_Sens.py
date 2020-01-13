@@ -91,18 +91,24 @@ class Data(ttk.Frame):
 
     def buscar(*args):
         fecha1, fecha2 = (fechaIn.get(), fechaFi.get())
-        valMAX, valMED, valMIN = (70, 44, 7)
+        if (sensorVar.get() == 1):
+            valMAX, valMED, valMIN = ("15.1 V", "13.4 V", "12.7 v")
+        elif (sensorVar.get()  == 2):
+            valMAX, valMED, valMIN = ("2.51 A", "2.17 A", "1.4 A")
+        elif (sensorVar.get()  == 3):
+            valMAX, valMED, valMIN = ("16.4ºC", "12.6ºC", "2.3ºC")
+
         if ((fecha1 == "") and (fecha2 == "")):
             fecha1, fecha2 = ("31/12/2018", "24/01/2020")
             pass
         
         """
         valMax = sql("ELECT MAX(Value_Max) FROM Resum_table WHERE ID = {} AND Date_Start >= {} AND Date_Start <= {}"
-        .format(sensorVar, fecha1, fecha2))
+        .format(sensorVar.get(), fecha1, fecha2))
         valMed = sql("SELECT MIN(Value_Min) FROM Resum_table WHERE ID = {} AND Date_Start >= {} AND Date_Start <= {}"
-        .format(sensorVar, fecha1, fecha2))
+        .format(sensorVar.get(), fecha1, fecha2))
         valMin = sql("ELECT AVG(Avg) FROM Resum_table WHERE ID = {} AND Date_Start >= {} AND Date_Start <= {}"
-        .format(sensorVar, fecha1, fecha2))
+        .format(sensorVar.get(), fecha1, fecha2))
         """
         info.configure(text = "Valores estadísticos entre {} y {}"
                              .format(fecha1, fecha2))
