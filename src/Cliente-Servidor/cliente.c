@@ -1,3 +1,4 @@
+//Compilar gcc cliente.c -o cliente -lsqlite3
 /***************************************************************************
                           main.c  -  client
                              -------------------
@@ -53,7 +54,7 @@ void E_R_Datos(char missatge[200],char buffer[200]);
 void ImprimirMenu(void);
 int callback(void *data, int argc, char **argv, char **azColName);
 int openDB(char * name, sqlite3** db); //Crear o obrir la base de dades
-
+int insert_Sensors_table(sqlite3* db,int ID, char* Tipo_sensor,char* Unitat_de_mesura, char* Descripcio_sensor, char* Localitzacio_sensor,int intervalo, char* IP);
 
  /************************
 *
@@ -68,7 +69,7 @@ int main(int argc, char *argv[]){
 	
 	//Lectura por comandos de IP del servidor para consultas HTTP y ruta y nombre de la base de datos
 	int opt= 0;
-	char *ip_servidor="127.0.0.1",*ruta_bbdd=".";
+	char *ip_servidor="127.0.0.1",*ruta_bbdd="bbdd";
 	static struct option long_options[] = {
         {"ip_servidor",		required_argument,	0,	'i'},
         {"ruta_bbdd",		required_argument,	0,	'r'},
@@ -78,77 +79,174 @@ int main(int argc, char *argv[]){
     while ((opt = getopt_long(argc, argv,"i:r:", 
                    long_options, &long_index )) != -1) {
         switch (opt) {
-             case 'i' : ip_servidor = optarg;
-                 break;
+             case 'i' : 
+				ip_servidor = optarg;
+				printf("La IP del servidor seleccionada es: %s\n",ip_servidor);
+				break;
+             case 'r' : 
+				ruta_bbdd = optarg;
+				printf("La ruta de la base de dades seleccionada es: %s\n",ruta_bbdd);
+				break;
              default: print_usage(); 
                  exit(EXIT_FAILURE);
         }
     }
-
+    //Variables comunicación 
+   	char input,enviat[200],rebut[200];
+	//Variables sensores
+	int ID=0,intervalo=0;
+	char Tipo_sensor[50],Unitat_de_mesura[10],Descripcio_sensor[100],Localitzacio_sensor[50],IP[15];
   	sqlite3 *db;
     //Variables consulta sql
-	char data[200];
-	char sql[200];
+	char data[400];
+	char sql[400];
 	int rc;
 	char *zErrMsg = 0;	
- 	
- 	openDB(".", &db);
+ 	int max_sensores=0;
+ 	char data_inici[200];
+ 	openDB(ruta_bbdd, &db);
 	
 	// Comprobacion si hay tablas ya creadas en la base de datos
 	memset(sql, '\0', sizeof(sql));
-	sprintf(sql, "SELECT * FROM Sensors_table");
+	sprintf(sql, "SELECT * FROM Sensors");
 
 	/* Execute SQL statement */
 	rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
 
 	// Si no hay tablas, se crean
 	if (rc != SQLITE_OK) {
-		
-		//Creamos Tabla de Lecturas
+		printf("Creación de BBDD \n");
+		//Creamos Tabla de sensores
 		memset(sql, '\0', sizeof(sql));
-		sprintf(sql,	"CREATE TABLE Lectures_table(" \
+		sprintf(sql,	"CREATE TABLE Sensors(" \
 						"ID_row		INTEGER PRIMARY KEY AUTOINCREMENT,"\
 						"ID						INTEGER 	NOT NULL," \
-						"Date_time_lecture		DATE    	NOT NULL," \
-						"Value					INT   		NOT NULL);");
+						"Tipo_sensor			CHAR    	NOT NULL," \
+						"Unitat_de_mesura		CHAR    	NOT NULL," \
+						"Descripcio_sensor		CHAR    	NOT NULL," \
+						"Localitzacio_sensor	CHAR    	NOT NULL," \
+						"intervalo				INTEGER    	NOT NULL," \
+						"IP						CHAR   		NOT NULL);");
 		rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
 		
-		//Creamos Tabla de Sensores
+		//Creamos Tabla Resumen lecturas
 		memset(sql, '\0', sizeof(sql));
-		sprintf(sql,	"CREATE TABLE Sensors_table("  \
+		sprintf(sql,	"CREATE TABLE Resum("  \
 						"ID						INTEGER 	NOT NULL," \
-						"Types					CHAR  		NOT NULL," \
-						"Description			CHAR  		NOT NULL);");
+						"Data_inici				DATE  		NOT NULL," \
+						"Increment_de_temps		INTEGER 	NOT NULL," \
+						"Maxim					FLOAT	 	NOT NULL," \
+						"Data_maxim				DATE  		NOT NULL," \
+						"Minim					FLOAT	 	NOT NULL," \
+						"Data_minim				DATE  		NOT NULL," \
+						"Mitjana				FLOAT  		NOT NULL);");
 		rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
 		
 		//Creamos Tabla de Alarmas
 		memset(sql, '\0', sizeof(sql));
-		sprintf(sql,	"CREATE TABLE Alarms_table("  \
-						"Date_time_alarm		DATE    NOT NULL," \
-						"Alarm_description		CHAR    NOT NULL);");
+		sprintf(sql,	"CREATE TABLE Alarmas("  \
+						"ID						INTEGER		NOT NULL," \
+						"Data					DATE		NOT NULL," \
+						"Descripcio				CHAR    	NOT NULL," \
+						"Valor					FLOAT  		NOT NULL);");
 		rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
-    
-    printf("La IP del servidor seleccionada es: %s\n",ip_servidor);
-	char input,enviat[200],rebut[200];
+		
+		//Creación de sensores debido a la falta de base de datos con datos sensores
+		ID=1;
+		sprintf(Unitat_de_mesura,"Volts");
+		sprintf(Tipo_sensor,"Sensor de tensión");
+		sprintf(Descripcio_sensor,"Sensor que muestra la tension en bornes de la batería");
+		sprintf(Localitzacio_sensor,"Bateria");
+		intervalo=30;
+		sprintf(IP,"192.168.11.207");
+		insert_Sensors_table(db,ID,Tipo_sensor,Unitat_de_mesura,Descripcio_sensor,Localitzacio_sensor,intervalo,IP);
+		ID=2;
+		sprintf(Unitat_de_mesura,"Ampers");
+		sprintf(Tipo_sensor,"Sensor corriente");
+		sprintf(Descripcio_sensor,"Sensor que muestra la lectura de corriente de la batería");
+		sprintf(Localitzacio_sensor,"Bateria");
+		intervalo=30;
+		sprintf(IP,"192.168.11.207");
+		insert_Sensors_table(db,ID,Tipo_sensor,Unitat_de_mesura,Descripcio_sensor,Localitzacio_sensor,intervalo,IP);
+		ID=1;
+		sprintf(Unitat_de_mesura,"Humitat");
+		sprintf(Tipo_sensor,"Sensor humitat");
+		sprintf(Descripcio_sensor,"Sensor que mostra la humitat a la placa");
+		sprintf(Localitzacio_sensor,"Placa solar");
+		intervalo=30;
+		sprintf(IP,"192.168.11.211");
+		insert_Sensors_table(db,ID,Tipo_sensor,Unitat_de_mesura,Descripcio_sensor,Localitzacio_sensor,intervalo,IP);
+		ID=2;
+		sprintf(Unitat_de_mesura,"ºC");
+		sprintf(Tipo_sensor,"Sensor de temperatura");
+		sprintf(Descripcio_sensor,"Sensor que muestra la temperatura a la placa");
+		sprintf(Localitzacio_sensor,"Placa solar");
+		intervalo=30;
+		sprintf(IP,"192.168.11.211");
+		insert_Sensors_table(db,ID,Tipo_sensor,Unitat_de_mesura,Descripcio_sensor,Localitzacio_sensor,intervalo,IP);
+		ID=3;
+		sprintf(Unitat_de_mesura,"º");
+		sprintf(Tipo_sensor,"Sensor inclinació");
+		sprintf(Descripcio_sensor,"Sensor que muestra la orientació de la placa");
+		sprintf(Localitzacio_sensor,"Placa solar");
+		intervalo=30;
+		sprintf(IP,"192.168.11.211");
+		insert_Sensors_table(db,ID,Tipo_sensor,Unitat_de_mesura,Descripcio_sensor,Localitzacio_sensor,intervalo,IP);
+		ID=3;
+		sprintf(Unitat_de_mesura,"º");
+		sprintf(Tipo_sensor,"Sensor inclinació");
+		sprintf(Descripcio_sensor,"Sensor que muestra la orientació de la placa");
+		sprintf(Localitzacio_sensor,"Placa solar");
+		intervalo=30;
+		sprintf(IP,"192.168.11.211");
+		insert_Sensors_table(db,ID,Tipo_sensor,Unitat_de_mesura,Descripcio_sensor,Localitzacio_sensor,intervalo,IP);
+	} else printf("Tabla ya creada \n");
+
+
 
 	ImprimirMenu();
 	scanf("%s", &input);
 
+	// Buscamos el valor máximo de sensores que tenemos
+	memset(sql, '\0', sizeof(sql));
+	sprintf(sql, "SELECT MAX(ID_row) FROM Sensors");
+
+	/* Execute SQL statement */
+	rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
+	max_sensores = atoi(data);
 	while (input != 's')
 	{
 		memset (enviat,'\0',200);
 		memset (rebut,'\0',200);	
 		switch (input)
 		{
-			// declaración de variables para bucles dentro del switch (escribir cadenas)
-			int i;
-			//Limpiamos el espacio de memoria de enviat para que no se cuelen caracteres extraños	
-
 			case '1':
-				printf("Heu seleccionat l'opció 1\n");	
-				sprintf(enviat,"{A_2020/01/01_12:00:00_30_1}"); //cargem a la variable a enviar les dades
-				E_R_Datos(enviat, rebut);   
-				printf("\nS'ha rebut el codi d'error %s\n",rebut);
+				printf("Heu seleccionat l'opció 1\n");
+				for (int i = 0; i < max_sensores; i++)
+				{
+					sprintf(sql, "SELECT MAX(Data_inici) FROM Resum WHERE ID_row = %i;",i);
+					rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
+					sprintf(data_inici,"%s",data);
+					int ret = strncmp("2020", data_inici, 4);
+					if(ret > 0)
+					{
+						sprintf(data_inici,"2020/01/01_00:00:00");
+					}
+					sprintf(sql, "SELECT intervalo FROM Sensors WHERE ID_row = %i;",i);
+					rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
+					intervalo = atoi(data);
+					sprintf(sql, "SELECT ID FROM Sensors WHERE ID_row = %i;",i);
+					rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
+					ID = atoi(data);
+					sprintf(enviat,"{A_%s_%i_%i}",data_inici, intervalo, ID); //cargem a la variable a enviar les dades
+					E_R_Datos(enviat, rebut);
+					printf("\nS'ha rebut el codi: %s\n",rebut);	
+					
+					
+					memset (enviat,'\0',200);
+					memset (rebut,'\0',200);
+				}
+
 				break;           				
 			case '2':
 				break;           			
@@ -167,13 +265,13 @@ int main(int argc, char *argv[]){
 				printf("He llegit %c \n",input);
 				break;
 			}
+		ImprimirMenu();
 		scanf("%s", &input);
 		}
 
 	
 	printf("Heu seleccionat la opció sortida\n");
 	return 0;
-}
 }
 
 
@@ -267,6 +365,27 @@ int callback(void *data, int argc, char **argv, char **azColName){
 		sprintf(data, "%s", argv[i] ? argv[i] : "NULL");
 		//printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
    }
-	printf("\n");
+	//~ printf("\n");
 	return 0;
+}
+
+//Insertar en tabla sensor
+int insert_Sensors_table(sqlite3* db,int ID, char* Tipo_sensor,char* Unitat_de_mesura, char* Descripcio_sensor, char* Localitzacio_sensor, int intervalo, char* IP){
+	int rc;
+	char sql[500];
+	char *zErrMsg = 0;
+	
+
+	/* Insercion de valores Tabla Sensors_table*/
+	sprintf(sql,"INSERT INTO Sensors (ID,Tipo_sensor,Unitat_de_mesura,Descripcio_sensor,Localitzacio_sensor,intervalo,IP) VALUES (%i,'%s','%s','%s','%s','%i','%s');", ID, Tipo_sensor, Unitat_de_mesura, Descripcio_sensor, Localitzacio_sensor, intervalo, IP);
+	rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
+
+	if( rc != SQLITE_OK ){
+		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		sqlite3_free(zErrMsg);
+
+		return 1;
+			
+		}
+	return 0;	   
 }

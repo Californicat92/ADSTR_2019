@@ -1,3 +1,4 @@
+
 /*
  * server_main1.c
  * 
@@ -61,7 +62,7 @@ int database_media(char *media, char *fecha_hora, char *id, char *fecha_hora_des
 int database_maximo(char *maxima, char *fecha_hora, char *id, char *fecha_hora_despues);
 int database_minimo( char *minimo, char *fecha_hora, char *id, char *fecha_hora_despues);
 
-int after_timer( char *dia, char *mes, char *year ,char *hora, char *min, char *seg, char *contador, char *fecha_hora_despues);
+//~ int after_timer( char *dia, char *mes, char *year ,char *hora, char *min, char *seg, char *contador, char *fecha_hora_despues);
 
 int callback_all(void *data, int argc, char **argv, char **azColName);
 
@@ -179,12 +180,13 @@ int comunicacio(char buffer_rebut[], char buffer_enviat[]){
 							case 'A':
 														printf("4\n\n");	
 							sprintf(fecha_hora_actual, "%c%c/%c%c/%c%c%c%c %c%c:%c%c:%c%c", dia[0], dia[1], mes[0], mes[1], year[0], year[1], year[2], year[3], hora[0], hora[1], min[0], min[1], seg[0], seg[1]); 
-							 after_timer(dia, mes, year, hora, min, seg, contador, fecha_hora_despues);
+							 //~ after_timer(dia, mes, year, hora, min, seg, contador, fecha_hora_despues);
 							 //database_media(media, fecha_hora_actual, id, fecha_hora_despues);
 							 //database_maximo(maxima,fecha_hora_actual,id, fecha_hora_despues);
 							 //database_minimo(minimo,fecha_hora_actual,id, fecha_hora_despues);
 							 
-							sprintf(buffer_enviat,"{C%s}",fecha_hora_despues);
+							//~ sprintf(buffer_enviat,"{C%s}",fecha_hora_actual);
+							sprintf(buffer_enviat,"{A_01_%s_30_10.10_%s_1.50_%s_5.55}",fecha_hora_actual,fecha_hora_actual,fecha_hora_actual);
 							//sprintf(buffer_enviat,"{C%s/%s/%s_%s:%s:%s_%s_%2.2s_%s_%s}", year,mes,dia,hora,min,seg, contador, media,maximo,minimo);
 											
 
@@ -195,7 +197,7 @@ int comunicacio(char buffer_rebut[], char buffer_enviat[]){
 							memset (fecha_hora_actual,'\0',48);
 							sprintf(fecha_hora_actual, "%c%c/%c%c/%c%c%c%c %c%c:%c%c:%c%c", dia[0], dia[1], mes[0], mes[1], year[0], year[1], year[2], year[3], hora[0], hora[1], min[0], min[1], seg[0], seg[1]); 
 							
-							after_timer(dia, mes, year, hora, min, seg, contador, fecha_hora_despues);
+							//~ after_timer(dia, mes, year, hora, min, seg, contador, fecha_hora_despues);
 							
 							
 							
@@ -509,39 +511,39 @@ int database_minimo( char *minimo, char *fecha_hora, char *id, char *fecha_hora_
 	return 0;
 }
 
-int after_timer( char *dia, char *mes, char *year ,char *hora, char *min, char *seg, char *contador, char *fecha_hora_despues){
+//~ int after_timer( char *dia, char *mes, char *year ,char *hora, char *min, char *seg, char *contador, char *fecha_hora_despues){
 	
 	
-	int segundos_segundos = 0;
-	char hora_caracter[50];
-	char fecha_caracter[50];
+	//~ int segundos_segundos = 0;
+	//~ char hora_caracter[50];
+	//~ char fecha_caracter[50];
 	
-	int horas = atoi(hora);
-	int minutos = atoi(min);
-	int segundos = atoi(seg);
-	int cont = atoi(contador);
+	//~ int horas = atoi(hora);
+	//~ int minutos = atoi(min);
+	//~ int segundos = atoi(seg);
+	//~ int cont = atoi(contador);
 
-	segundos_segundos = segundos + cont;
+	//~ segundos_segundos = segundos + cont;
 
-	if(segundos_segundos >=60){
-		segundos_segundos = segundos_segundos - 60;
-		minutos = minutos + 1;
-	}
-	if(minutos >= 60){
-	minutos = minutos - 60;
-	horas = horas + 1;
+	//~ if(segundos_segundos >=60){
+		//~ segundos_segundos = segundos_segundos - 60;
+		//~ minutos = minutos + 1;
+	//~ }
+	//~ if(minutos >= 60){
+	//~ minutos = minutos - 60;
+	//~ horas = horas + 1;
 		
-	}
-	if(horas >= 24){
-	horas = 0;
-	}	
+	//~ }
+	//~ if(horas >= 24){
+	//~ horas = 0;
+	//~ }	
 	
-	sprintf(hora_caracter, "%d:%d:%d", horas, minutos, segundos_segundos);
-	sprintf(fecha_caracter, "%s/%s/%s", dia, mes, year);
-	sprintf(fecha_hora_despues, "%s %s", fecha_caracter, hora_caracter);
+	//~ sprintf(hora_caracter, "%d:%d:%d", horas, minutos, segundos_segundos);
+	//~ sprintf(fecha_caracter, "%s/%s/%s", dia, mes, year);
+	//~ sprintf(fecha_hora_despues, "%s %s", fecha_caracter, hora_caracter);
 	
-	return 0;
-}
+	//~ return 0;
+//~ }
 
 
 	
