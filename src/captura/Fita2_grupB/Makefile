@@ -1,11 +1,11 @@
 all: Captura //Fita 2
 
 exec:
-	LD_LIBRARY_PATH=. ./Captura -i 192.168.11.175 -n config.txt -r /home/pi/Desktop/ADSTR_2019/src/captura/captura.db
+	LD_LIBRARY_PATH=. ./Captura -i 192.168.11.175 -n config.txt -r /home/pi/Desktop/fita3/ADSTR_2019/src/captura/Fita2_grupB/captura.db
 
 Captura: http.o libHTTP.so Basedades.o Funciones.o 
 	gcc Basedades.o Funciones.o -o Captura -lsqlite3 -L. -lHTTP -lwiringPi
-	LD_LIBRARY_PATH=. ./Captura -i 192.168.11.175 -n config.txt -r /home/pi/Desktop/ADSTR_2019/src/captura/captura.db
+	LD_LIBRARY_PATH=. ./Captura -i 192.168.1.71 -n config.txt -r /home/pi/Desktop/fita3/ADSTR_2019/src/captura/Fita2_grupB/captura.db
 
 main.o: Basedades.c
 	gcc -c Basedades.c

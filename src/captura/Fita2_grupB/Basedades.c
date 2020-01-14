@@ -158,7 +158,7 @@ int main(int argc, char* argv[]) {
 
 
 		//----Lectura de sensor intensidad de carga a la batería--------
-		ret = spiadc_config_transfer(DIFERENTIAL_CH0_CH1, &value_int);
+		ret = spiadc_config_transfer(DIFERENTIAL_CH1_CH0, &value_int);
 		
 		value_amps=value_int*4.65; //Conversión a voltaje real	
 		id = 2;
