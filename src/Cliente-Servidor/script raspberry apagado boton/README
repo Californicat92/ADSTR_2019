@@ -1,0 +1,17 @@
+
+Movemos el archivo escuchando-para-apagar.py a la carpeta correspondiente y le damos más derechos sobre el sistema
+
+sudo mv listen-for-shutdown.py /usr/local/bin/
+sudo chmod +x /usr/local/bin/escuchando-para-apagar.py
+
+
+Movemos el archivo escuchando-para-apagar.sh a la carpeta correspondiente y le damos más derechos sobre el sistema:
+
+sudo mv listen-for-shutdown.sh /etc/init.d/
+sudo chmod +x /etc/init.d/escuchando-para-apagar.sh
+
+
+Iniciamos el script para que nuestra Raspberry este pendiente en el puerto 21 del script:
+sudo update-rc.d escuchando-para-apagar.sh defaults
+sudo /etc/init.d/escuchando-para-apagar.sh start
+
